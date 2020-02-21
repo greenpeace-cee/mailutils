@@ -1,0 +1,44 @@
+{
+  "name": "mailutils",
+  "version": "1.0.0",
+  "description": "CiviCRM Mail Utilities Extension",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/greenpeace-cee/mailutils.git"
+  },
+  "keywords": [
+    "civicrm"
+  ],
+  "author": "Patrick Figel",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/greenpeace-cee/mailutils/issues"
+  },
+  "homepage": "https://github.com/greenpeace-cee/mailutils#readme",
+  "devDependencies": {
+    "civicrm-cv": "^0.1.2",
+    "civicrm-scssroot": "github:totten/civicrm-scssroot",
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^7.0.1",
+    "gulp-clean-css": "^4.2.0",
+    "gulp-postcss": "^8.0.0",
+    "gulp-rename": "^2.0.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-sass-glob": "^1.1.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-strip-css-comments": "^2.0.0",
+    "gulp-transform-selectors": "0.0.2",
+    "postcss-discard-duplicates": "^4.0.2",
+    "postcss-prefix-selector": "^1.7.2"
+  },
+  "dependencies": {
+    "moment": "^2.24.0"
+  }
+}

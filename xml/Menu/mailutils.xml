@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/mailutils/threads</path>
+    <page_callback>CRM_Mailutils_Page_ContactThreadList</page_callback>
+    <title>Emails</title>
+    <access_arguments>access mailutils</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/mailutils/contact/thread</path>
+    <page_callback>CRM_Mailutils_Page_ContactThreadTab</page_callback>
+    <title>Emails</title>
+    <access_arguments>access mailutils</access_arguments>
+  </item>
+</menu>

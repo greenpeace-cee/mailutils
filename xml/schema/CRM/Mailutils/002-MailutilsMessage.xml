@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailutils</base>
+  <class>MailutilsMessage</class>
+  <name>civicrm_mailutils_message</name>
+  <comment>CiviCRM mailutils message container</comment>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique MailutilsMessage ID</comment>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>activity_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Activity</comment>
+  </field>
+  <foreignKey>
+    <name>activity_id</name>
+    <table>civicrm_activity</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>mail_setting_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Mail Setting</comment>
+  </field>
+  <foreignKey>
+    <name>mail_setting_id</name>
+    <table>civicrm_mail_settings</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>mailutils_thread_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Mailutils Thread</comment>
+  </field>
+  <foreignKey>
+    <name>mailutils_thread_id</name>
+    <table>civicrm_mailutils_thread</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>subject</name>
+    <title>Subject</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>false</required>
+    <comment>Subject</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>subject_normalized</name>
+    <title>Subject (Normalized)</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>false</required>
+    <comment>Normalized Subject</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>message_id</name>
+    <title>Message ID</title>
+    <type>varchar</type>
+    <length>995</length>
+    <required>true</required>
+    <comment>Message ID</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>in_reply_to</name>
+    <title>In Reply To</title>
+    <type>varchar</type>
+    <length>995</length>
+    <comment>Message ID this message is in reply to</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>headers</name>
+    <title>Headers</title>
+    <type>text</type>
+    <required>true</required>
+    <comment>Mail Envelope headers (JSON)</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>body</name>
+    <title>Body</title>
+    <type>text</type>
+    <required>true</required>
+    <comment>Mail content (JSON)</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+</table>

@@ -1,0 +1,28 @@
+<mailutils-bulk-actions-checkboxes
+  ng-show="!viewingThread && selectedThreads && bulkAllowed && !item.lock"
+  class="pull-left"
+  show-checkboxes="$parent.showCheckboxes"
+  is-select-all-available="isSelectAllAvailable"
+  selected-items="selectedThread.length"
+  everything-count="totalCount"
+  displayed-count="threads.length">
+</mailutils-bulk-actions-checkboxes>
+<span
+  class="mailutils__bulkactions-actions-dropdown btn-group btn-group-sm"
+  ng-if="!viewingThread && selectedThreads && bulkAllowed && !item.lock">
+  <div class="btn-group">
+    <button
+      type="button" class="btn btn-default mailutils__bulkactions-actions-dropdown__text"
+      ng-class="{disabled: !selectedThreads.length || !showCheckboxes}"
+      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      {{ ts('Actions') }}
+    </button>
+    <button
+      type="button" class="btn btn-default dropdown-toggle"
+      ng-class="{disabled: !selectedThreads.length || !showCheckboxes}"
+      data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu" mailutils-thread-actions="selectedThreads" is-bulk-mode="true" refresh-callback="refresh"></ul>
+  </div>
+</span>

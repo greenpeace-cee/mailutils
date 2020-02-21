@@ -1,0 +1,264 @@
+.mailutils__thread-list-table-container {
+  border-left: 1px solid $gray-light;
+  margin-left: $thread-card-width;
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.mailutils__thread-list-table {
+  table-layout: inherit;
+
+  td:first-child,
+  th:first-child {
+    width: $thread-card-width;
+  }
+
+  th {
+    line-height: 18px;
+    min-width: 142px;
+    padding: 22px 15px !important;
+  }
+
+  .mailutils__bulkactions-checkbox {
+    top: 2px;
+  }
+
+  .mailutils__bulkactions-actions-dropdown {
+    top: 2px;
+
+    .mailutils__bulkactions-actions-dropdown__text {
+      width: 60px;
+    }
+  }
+
+  .mailutils__thread-list-column--first {
+    padding: 16px 14px !important;
+  }
+
+  th:first-child {
+    background: $gray-lighter;
+    width: $thread-card-width;
+  }
+
+  tr {
+    height: 50px;
+  }
+
+  thead tr {
+    height: 50px;
+  }
+
+  tbody tr {
+    cursor: pointer;
+  }
+
+  td {
+    height: 50px;
+    min-width: 142px;
+    padding: 20px;
+
+    &:first-child {
+      background: $crm-white;
+      left: 0;
+      padding: 0;
+      position: absolute;
+      width: $thread-card-width;
+      z-index: 1;
+    }
+
+
+  }
+
+  td, th {
+    &:nth-child(2) {
+      width: 300px;
+    }
+    &:nth-child(4) {
+      text-align: right;
+    }
+  }
+
+  .thread-activity-card-wrapper {
+    max-width: 320px;
+    min-width: 320px;
+    position: relative;
+  }
+}
+
+
+.mailutils__thread-list-table__header {
+  &.affix {
+    display: block;
+    left: 0;
+    margin-left: $thread-card-width;
+    overflow-x: hidden;
+    overflow-y: visible;
+    right: 0;
+    top: 60px;
+    z-index: 10;
+
+    tr {
+      display: table;
+      width: 100%;
+    }
+
+    th {
+      border-bottom: 1px solid $gray-light;
+      display: table-cell;
+    }
+
+    th:nth-child(1) {
+      left: 0;
+      position: fixed;
+    }
+  }
+}
+
+.mailutils__thread-list {
+  margin: 0;
+  overflow: hidden;
+  position: relative;
+
+  .mailutils__bulkactions-message {
+    .alert {
+      border-bottom: 0;
+    }
+  }
+
+  .mailutils__pager--fixed {
+    position: fixed;
+  }
+
+  .mailutils__pager--viewing-thread {
+    width: $thread-card-width;
+
+    &.mailutils__pager--fixed {
+      position: absolute;
+    }
+  }
+
+  .mailutils__pager--thread-focused {
+    display: none;
+  }
+}
+
+.mailutils__thread-list--summary {
+  > .mailutils__pager {
+    bottom: 0;
+    height: 60px;
+    position: absolute;
+  }
+
+  .mailutils__thread-list-table-container {
+    overflow-x: hidden;
+  }
+}
+
+.mailutils__thread-list-panel {
+  border-top: 1px solid $crm-grayblue-dark;
+  box-shadow: none;
+  margin-bottom: 0;
+  overflow: auto;
+  padding: 0;
+  position: relative;
+  transition: width 0.3s linear;
+}
+
+.mailutils__thread-list-panel--summary {
+  border-top: 0;
+  bottom: 60px;
+  overflow-x: hidden;
+  position: absolute;
+  top: 65px;
+  width: $thread-card-width;
+
+  thead {
+    display: none;
+  }
+
+  .mailutils__thread-list-column--first {
+    background: $crm-white !important;
+  }
+
+  .mailutils__thread-list-table {
+    td:first-child {
+      width: 100%;
+    }
+  }
+}
+
+.mailutils__thread-list-column--first--detached {
+  background: $crm-white;
+  border-bottom: 1px solid $crm-grayblue-dark;
+  border-top: 1px solid $crm-grayblue-dark;
+  height: 50px;
+  left: 0;
+  padding: 16px 14px;
+  position: absolute;
+  width: $thread-card-width;
+}
+
+.mailutils__thread-list-panel--focused {
+  width: 0;
+
+  .mailutils__pager {
+    display: none;
+  }
+}
+
+.mailutils__thread-details-panel {
+  box-shadow: none;
+  display: none;
+  float: right;
+  height: 0;
+  overflow: hidden;
+  transition: width 0.3s;
+  width: 0;
+
+  > .panel-body {
+    background: none;
+  }
+}
+
+.mailutils__thread-details-panel--summary {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+  width: calc(100% - #{$thread-card-width});
+}
+
+.mailutils__thread-details-panel--focused {
+  width: 100%;
+}
+
+.mailutils__thread-list-sortable-header {
+  cursor: pointer;
+
+  &:hover {
+    background-color: $gray-light;
+  }
+
+  &.active {
+    background-color: $gray-light !important;
+  }
+}
+
+.mailutils__thread-list__toggle-sort {
+  color: $crm-gray-matte;
+  cursor: pointer;
+  font-size: 20px;
+  position: relative;
+  top: 7px;
+}
+
+.mailutils__thread-list__header-toggle-sort {
+  float: right;
+  position: relative;
+  top: 3px;
+}
+
+.mailutils__thread-sort-dropdown {
+  box-shadow: none;
+  display: inline-block;
+  width: 90px !important;
+}

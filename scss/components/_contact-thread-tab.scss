@@ -1,0 +1,154 @@
+.mailutils__contact-thread-tab {
+  margin-left: -5px;
+}
+
+.mailutils__contact-thread-tab-container {
+  padding-left: 15px;
+  padding-right: 15px;
+
+  .mailutils__panel-transparent-header {
+    >.panel-heading .panel-title { /* stylelint-disable selector-max-compound-selectors */
+      font-size: $font-size-h2;
+      margin: 0;
+      padding: 15px 0;
+    }
+
+    > .panel-body {
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+    }
+  }
+}
+
+.mailutils__contact-thread-tab__thread-list__footer {
+  margin-top: 24px;
+
+  .btn {
+    box-shadow: $box-shadow-block;
+  }
+}
+
+.mailutils__contact-thread-tab-empty {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  padding: 50px 0;
+
+  a {
+    color: $gray-dark;
+  }
+}
+.mailutils__contact-thread-tab-button {
+  margin-bottom: 10px;
+
+  .material-icons {
+    margin-right: 5px;
+    position: relative;
+    top: 2px;
+  }
+}
+
+.mailutils__contact-thread-tab-details {
+  $panel-header-top-margin: calc((#{$headings-line-height} * #{$font-size-h2}) + 2 * 15px);
+
+  box-shadow: $box-shadow-block;
+  margin-top: #{$panel-header-top-margin};
+
+  > .panel-body {
+    padding: 0;
+  }
+
+  .btn-group {
+    margin-right: 5px;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+
+  .mailutils__activity-card {
+    width: 100%;
+  }
+
+  .mailutils__summary-tab__subject {
+    margin-bottom: 3px;
+    margin-left: -2px;
+    margin-top: 5px;
+  }
+
+  .mailutils__contact-card--client,
+  .mailutils__contact-card--manager {
+    .material-icons {
+      line-height: 1;
+    }
+  }
+
+  .mailutils__contact-card--manager {
+    position: relative;
+    top: 2px;
+  }
+
+  .list-group-item-info {
+    color: $crm-gray-matte;
+    display: block;
+    padding: $crm-dropdown-item-padding;
+  }
+}
+
+.mailutils__contact-thread-tab-details__title {
+  margin: 6.5px 0;
+}
+
+.mailutils__contact-thread-tab__panel-row {
+  border-bottom: 1px solid $gray-light;
+  padding: 15px 24px;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.mailutils__contact-thread-tab__panel-actions {
+  padding: 20px;
+}
+
+.mailutils__contact-thread-tab__panel-row--dark {
+  background-color: $gray-lighter;
+
+  .mailutils__pipe {
+    color: $gray-light;
+    margin: 0 8px;
+  }
+}
+
+.mailutils__contact-thread-tab__panel-fields {
+  padding-bottom: 15px;
+}
+
+.mailutils__contact-thread-tab__panel-fields--inline {
+  align-items: center;
+  display: flex;
+}
+
+.mailutils__contact-thread-tab__panel-field-emphasis {
+  color: $crm-gray-matte;
+}
+
+.mailutils__contact-thread-tab__panel-field-title {
+  color: $crm-gray-matte;
+  margin-bottom: 5px;
+}
+
+.___outside-namespace {
+  .crm-contact-page {
+    #ui-id-5 { /* stylelint-disable selector-max-id */
+      padding: 30px;
+      width: calc(100% - 200px);
+    }
+  }
+}
+
+.mailutils__contact-thread-tab-message-text {
+  white-space: pre-line;
+}
