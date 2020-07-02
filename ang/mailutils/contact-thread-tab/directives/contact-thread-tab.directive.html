@@ -1,0 +1,184 @@
+<div id="bootstrap-theme" class="clearfix">
+  <h1 crm-page-title class="element-invisible">Email threads involving the contact</h1>
+  <div class="mailutils__contact-thread-tab clearfix" ng-show="!viewingThread">
+    <a class="btn-primary btn mailutils__contact-thread-tab-button mailutils__contact-thread-tab-add" ng-href="TODO">
+      <i class="material-icons">email</i>
+      {{ ts('Compose') }}
+    </a>
+    <a class="btn-secondary btn mailutils__contact-thread-tab-button mailutils__contact-thread-tab-refresh" ng-click="showThreads(true)">
+      <i class="material-icons">refresh</i>
+      {{ ts('Refresh') }}
+    </a>
+    <div class="clearfix" ng-if="totalCount > 0">
+      <table class="table mailutils__thread-list-table" >
+        <thead class="mailutils__thread-list-table__header">
+        <tr>
+          <th
+            class="mailutils__thread-list-column--fixed mailutils__thread-list-column--first"
+            ng-include="'~/mailutils/thread/directives/thread-list-table-first-column-header.html'">
+          </th>
+          <th
+            ng-repeat="header in headers"
+            mailutils-thread-list-sort-header="{{ header.sort }}">
+            {{ ts(header.label) }}
+          </th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr ng-if="!isLoading" ng-repeat="thread in threads" ng-click="viewThread(thread)">
+          <td>
+            <span
+              class="mailutils__checkbox mailutils__checkbox--bulk-action"
+              ng-if="selectedThreads && bulkAllowed"
+              role="checkbox"
+              tabindex="0"
+              aria-labelledby="Select/Unselect"
+              ng-click="toggleSelected(thread); $event.stopPropagation();">
+              <i ng-if="thread.selected" class="mailutils__checkbox--checked material-icons">check_box</i>
+            </span>
+          </td>
+          <td>
+            <a href="mailto:{{ party.email }}" ng-repeat="name in thread.mailutils_message_party_names">
+              {{ name }}{{$last ? '' : ', '}}
+            </a>
+          </td>
+          <td>
+            {{ thread.mailutils_messages[0].subject_normalized }}
+          </td>
+          <td>
+            <span title="{{formatDate(thread.date, 'DD MMM YYYY HH:MM:SS')}}">
+              {{calendar(thread.date)}}
+            </span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      <!--
+      <div class="mailutils__contact-thread-tab-container pull-left col-md-6">
+        <table>
+          <thead>
+            <tr>
+              <th>
+                Subject
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="thread in threads">
+              <td>
+                {{ thread['mailutils_messages'][0]['subject'] }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      -->
+    </div>
+  </div>
+  <div class="mailutils__contact-thread-tab clearfix" ng-show="viewingThread">
+    <div
+      class="panel panel-default civicase__panel-transparent-header">
+      <div class="panel-heading">
+        <div class="panel-icons">
+          <a class="btn-primary btn mailutils__contact-thread-tab-button mailutils__contact-thread-tab-back" ng-click="showThreads()">
+            <i class="material-icons">arrow_back</i>
+            {{ ts('Back') }}
+          </a>
+          <a class="btn-danger btn mailutils__contact-thread-tab-button mailutils__contact-thread-tab-delete" ng-click="deleteThread(selectedThread.id)">
+            <i class="material-icons">delete</i>
+            {{ ts('Delete') }}
+          </a>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="civicase__activity-feed__list civicase__animated-checkbox-card"
+          ng-repeat="activity in selectedThread.activities"
+          ng-class="{'active_xxx': $first}">
+          <div
+            class="civicase__activity-feed__list-item"
+            ng-class="{'civicase__activity-feed__list__vertical_bar': !$last}">
+            <span class="civicase__contact-card">
+              <span>
+                <!-- Contact Avatar -->
+                <span class="civicase__contact-avatar crm_notification-badge">
+                  <i class="material-icons" ng-if="activity.activity_type_id == 12">inbox</i>
+                  <i class="material-icons" ng-if="activity.activity_type_id != 12">reply</i>
+                </span>
+                <!-- End - Contact Avatar -->
+              </span>
+            </span>
+            <div class="civicase__activity-feed__activity-container">
+              <div class="civicase__activity-card civicase__activity-card--long">
+                <div class="panel panel-default" ng-click="viewActivityDetails($event, activity)">
+                  <div class="panel-body">
+                    <div class="civicase__activity-card-row civicase__activity-card-row--first">
+                      <!-- Subject -->
+                      <div class="civicase__activity-type">{{ activity.subject }}</div>
+                      <!-- End - Subject -->
+                      <span class="civicase__activity__right-container">
+                        <!-- Activity Date -->
+                        <span
+                          class="civicase__activity-date">
+                          <span class="civicase__activity-date__with-year">
+                            {{formatDate(activity.activity_date_time, 'DD MMM YYYY HH:MM')}}
+                          </span>
+                        </span>
+                      </span>
+                      <!-- End - Activity Date -->
+                      <div>
+                        <div class="btn-group btn-group-sm civicase__activity-card-menu">
+                          <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="material-icons">more_vert</i>
+                          </button>
+                          <ul class="dropdown-menu dropdown-menu-right">
+                            <li>
+                              <a>
+                                <i class="material-icons">reply</i>
+                                Reply
+                              </a>
+                            </li>
+                            <li>
+                              <a>
+                                <i class="material-icons">forward</i>
+                                Forward
+                              </a>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="civicase__activity-card-row civicase__activity-card-row--communication">
+                      <div>
+                        <span ng-if="!$first">To:&nbsp;</span>
+                        <span ng-if="$first">From:&nbsp;</span>
+                        <span><a href="#">spenden@greenpeace.at</a></span>
+                      </div>
+                      <div class="civicase__activity__right-container">
+                        <span ng-if="!$first">From:&nbsp;</span>
+                        <span ng-if="$first">To:&nbsp;</span>
+                        <span><a href="#">Patrick Figel</a></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="panel-footer">
+                    <div class="mailutils__contact-thread-tab-message-text">
+                      {{activity.details}}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div  ng-if="totalCount == 0" class="mailutils__contact-thread-tab-empty">
+    <div class="mailutils__no-result-icon mailutils__no-result-icon--thread"></div>
+    <div class="mailutils__card--big--empty-title"> This contact has not sent or received any email</div>
+    <div class="mailutils__card--big--empty-description"> Click the button below to compose a new message</div>
+    <a class="mailutils__card--big--empty-button btn" ng-href="TODO">
+      {{ ts('Compose') }}
+    </a>
+  </div>
+</div>

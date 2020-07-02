@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailutils</base>
+  <class>MailutilsMessageParty</class>
+  <name>civicrm_mailutils_message_party</name>
+  <comment>CiviCRM mailutils message parties</comment>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique MailutilsMessageParty ID</comment>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>mailutils_message_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Mailutils Message</comment>
+  </field>
+  <foreignKey>
+    <name>mailutils_message_id</name>
+    <table>civicrm_mailutils_message</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Contact</comment>
+    <required>false</required>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>party_type_id</name>
+    <title>Party Type</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Message Party Type (From, To, CC, BCC)</comment>
+    <pseudoconstant>
+      <optionGroupName>mailutils_party_type</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+
+  <field>
+    <name>name</name>
+    <title>Party Name</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>false</required>
+    <comment>Party name</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>email</name>
+    <title>Party Email</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>true</required>
+    <comment>Party email</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+</table>
