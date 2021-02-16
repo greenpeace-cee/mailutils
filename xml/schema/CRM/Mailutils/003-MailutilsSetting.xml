@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Mailutils</base>
+  <class>MailutilsSetting</class>
+  <name>civicrm_mailutils_setting</name>
+  <comment>Extended settings for CiviCRM Mail Accounts (Mail Settings)</comment>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique MailutilsSetting ID</comment>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>mail_setting_id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>FK to Mail Setting</comment>
+  </field>
+  <foreignKey>
+    <name>mail_setting_id</name>
+    <table>civicrm_mail_settings</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>mailutils_template_id</name>
+    <title>Mailutils Template ID</title>
+    <type>int unsigned</type>
+    <required>false</required>
+    <comment>Mailtuils Template for new messages</comment>
+  </field>
+  <foreignKey>
+    <name>mailutils_template_id</name>
+    <table>civicrm_mailutils_template</table>
+    <key>id</key>
+    <onDelete>SET NULL</onDelete>
+  </foreignKey>
+
+  <field>
+    <name>smtp_server</name>
+    <title>SMTP Server</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>false</required>
+    <comment>SMTP Server</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>smtp_port</name>
+    <title>SMTP Port</title>
+    <type>int unsigned</type>
+    <required>false</required>
+    <comment>SMTP Port</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>smtp_username</name>
+    <title>SMTP Username</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>false</required>
+    <comment>SMTP Username</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>smtp_password</name>
+    <title>SMTP Password</title>
+    <type>varchar</type>
+    <length>255</length>
+    <required>false</required>
+    <comment>SMTP Password</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
+  <field>
+    <name>support_case_category_id</name>
+    <title>Support Case Category</title>
+    <type>int unsigned</type>
+    <required>false</required>
+    <comment>Support Case Category</comment>
+    <pseudoconstant>
+      <optionGroupName>support_case_category</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+
+</table>
