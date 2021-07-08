@@ -10,7 +10,7 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
   /**
    * @inheritDoc
    */
-  protected function getObjects() {
+  protected function getObjects(\Civi\Api4\Generic\Result $result) {
     $where = $this->getWhere();
     $involved_contact_clause = NULL;
     foreach ($where as $key => $clause) {
@@ -30,7 +30,7 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
       }
       $this->addWhere('id', 'IN', $thread_ids);
     }
-    return parent::getObjects();
+    return parent::getObjects($result);
   }
 
   private function getThreadIdsByContact($clause) {

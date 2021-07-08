@@ -9,7 +9,7 @@ namespace Civi\Api4;
  * @package Civi\Api4
  */
 class MailutilsThread extends Generic\DAOEntity {
-  public static function get() {
+  public static function get($checkPermissions = true) {
     return new \Civi\Api4\Action\MailutilsThread\Get(__CLASS__, __FUNCTION__);
   }
 }

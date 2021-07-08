@@ -74,14 +74,14 @@ class ProcessorTest extends BaseTest {
     // test that From is extracted
     $from = \Civi\Api4\MailutilsMessageParty::get()
       ->addWhere('mailutils_message.subject', '=', self::FIXTURE_SUBJECT)
-      ->addWhere('mailutils_party_type.name', '=', 'from')
+      ->addWhere('party_type_id:name', '=', 'from')
       ->execute()
       ->first();
     $this->assertEquals('my@example.com', $from['email']);
     // Test that To is extracted
     $to = \Civi\Api4\MailutilsMessageParty::get()
       ->addWhere('mailutils_message.subject', '=', self::FIXTURE_SUBJECT)
-      ->addWhere('mailutils_party_type.name', '=', 'to')
+      ->addWhere('party_type_id:name', '=', 'to')
       ->execute()
       ->first();
     $this->assertEquals('b.2.1.aaaaaaaaaaaaaaaa@example.com', $to['email']);
