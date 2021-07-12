@@ -9,10 +9,12 @@ class Message {
 
   protected $mail;
   protected $activityId;
+  protected $mailSettings;
 
-  public function __construct(\ezcMail $mail, int $activityId) {
+  public function __construct(\ezcMail $mail, int $activityId, array $mailSettings) {
     $this->mail = $mail;
     $this->activityId = $activityId;
+    $this->mailSettings = $mailSettings;
   }
 
   public function process() {
@@ -26,7 +28,7 @@ class Message {
         ];
       }
     }
-    // TODO: parse Delivered-To header and set mail_setting_id (with alias handling)
+
     $message = MailutilsMessage::create()
       ->addValue('activity_id', $this->activityId)
       ->addValue('message_id', $this->stripBrackets(
@@ -40,6 +42,7 @@ class Message {
       ))
       ->addValue('body', json_encode($body))
       ->addValue('subject', $this->mail->subject)
+      ->addValue('mail_setting_id', $this->mailSettings['id'])
       ->setCheckPermissions(FALSE)
       ->execute()
       ->first();

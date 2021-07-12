@@ -106,4 +106,18 @@
     </html>
   </field>
 
+  <field>
+    <name>from_email_address_id</name>
+    <title>From Email Address</title>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>From Email Address</comment>
+    <pseudoconstant>
+      <optionGroupName>from_email_address</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+
 </table>

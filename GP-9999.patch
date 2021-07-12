@@ -1,0 +1,14 @@
+diff --git a/CRM/Utils/Mail/EmailProcessor.php b/CRM/Utils/Mail/EmailProcessor.php
+index 9d68310b9d..2e5beb5bd0 100644
+--- a/CRM/Utils/Mail/EmailProcessor.php
++++ b/CRM/Utils/Mail/EmailProcessor.php
+@@ -250,6 +250,9 @@ class CRM_Utils_Mail_EmailProcessor {
+           else {
+             $matches = TRUE;
+             CRM_Utils_Hook::emailProcessor('activity', $params, $mail, $result);
++            if (class_exists('CRM_Mailutils_Hook')) {
++              CRM_Mailutils_Hook::greenpeaceEmailProcessor('activity', $params, $mail, $result, $dao);
++            }
+             echo "Processed as Activity: {$mail->subject}\n";
+           }
+         }
