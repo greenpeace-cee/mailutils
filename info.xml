@@ -17,6 +17,9 @@
   <releaseDate>2021-07-12</releaseDate>
   <version>1.0-alpha.2</version>
   <develStage>alpha</develStage>
+  <requires>
+    <ext>at.greenpeace.casetools</ext>
+  </requires>
   <compatibility>
     <ver>5.39</ver>
   </compatibility>
