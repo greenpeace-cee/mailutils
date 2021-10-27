@@ -69,7 +69,6 @@ class ProcessorTest extends BaseTest {
       ->addWhere('mailutils_message.subject', '=', self::FIXTURE_SUBJECT)
       ->setLimit(25)
       ->execute();
-    var_dump($parties);
     $this->assertEquals(2, $parties->count(), 'Should have two involved parties');
     // test that From is extracted
     $from = \Civi\Api4\MailutilsMessageParty::get()
