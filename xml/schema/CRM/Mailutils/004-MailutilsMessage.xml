@@ -105,7 +105,7 @@
   <field>
     <name>headers</name>
     <title>Headers</title>
-    <type>text</type>
+    <type>longtext</type>
     <required>true</required>
     <comment>Mail Envelope headers (JSON)</comment>
     <html>
@@ -116,7 +116,7 @@
   <field>
     <name>body</name>
     <title>Body</title>
-    <type>text</type>
+    <type>longtext</type>
     <required>true</required>
     <comment>Mail content (JSON)</comment>
     <html>
