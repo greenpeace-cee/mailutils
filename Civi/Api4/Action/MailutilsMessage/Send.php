@@ -5,6 +5,7 @@ namespace Civi\Api4\Action\MailutilsMessage;
 use Civi\Api4\Activity;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\MailutilsMessage;
+use Civi\Mailutils\MessageParser;
 
 /**
  * Send a message
@@ -29,20 +30,17 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function _run(Result $result) {
-    $message = MailutilsMessage::get()
-      ->setSelect([
-        'mail_setting_id',
-        'subject',
-        'message_id',
-        'in_reply_to',
-        'headers',
-        'body',
-        'activity.id',
-        'activity.status_id',
-        'mailutils_message_parties.party_type_id',
-        'mailutils_message_parties.name',
-        'mailutils_message_parties.email',
+    $message = MailutilsMessage::get(FALSE)
+      ->addSelect('*', 'mail_settings.*', 'mailutils_setting.*', 'activity.*')
+      ->setJoin([
+        ['MailSettings AS mail_settings', 'LEFT', NULL, ['mail_setting_id', '=', 'mail_settings.id']],
+        ['MailutilsSetting AS mailutils_setting', 'INNER', NULL, ['mail_setting_id', '=', 'mailutils_setting.mail_setting_id']],
+        ['Activity AS activity', 'LEFT', NULL, ['activity_id', '=', 'activity.id']],
       ])
+      ->addChain('mailutils_message_parties', \Civi\Api4\MailutilsMessageParty::get()
+        ->addSelect('*', 'party_type_id:name')
+        ->addWhere('mailutils_message_id', '=', '$id')
+      )
       ->addWhere('id', '=', $this->messageId)
       ->execute()
       ->first();
@@ -66,9 +64,102 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
       );
     }
 
-    // TODO: send email, process results
+    $options = new \ezcMailComposerOptions();
+    $options->stripBccHeader = TRUE;
+    $options->automaticImageInclude = FALSE;
 
-    Activity::update()
+    $mail = new \ezcMailComposer($options);
+    foreach ($message['mailutils_message_parties'] as $messageParty) {
+      switch ($messageParty['party_type_id:name']) {
+        case 'from':
+          $mail->from = new \ezcMailAddress($messageParty['email'], $messageParty['name']);
+          break;
+
+        case 'to':
+          $mail->addTo(new \ezcMailAddress($messageParty['email'], $messageParty['name']));
+          break;
+
+        case 'cc':
+          $mail->addCc(new \ezcMailAddress($messageParty['email'], $messageParty['name']));
+          break;
+
+        case 'bcc':
+          $mail->addBcc(new \ezcMailAddress($messageParty['email'], $messageParty['name']));
+          break;
+      }
+    }
+    $mail->subject = $message['subject'];
+    $mail->messageId = $message['message_id'];
+    if (!empty($message['in_reply_to'])) {
+      $mail->setHeader('In-Reply-To', $message['in_reply_to']);
+    }
+    $headers = json_decode($message['headers'], TRUE);
+    foreach ($headers as $name => $value) {
+      $mail->setHeader($name, $value);
+    }
+
+    $body = json_decode($message['body'], TRUE);
+    if (empty($body)) {
+      $body = [
+        'html' => $message['activity_details'],
+        'text' => $message['activity_details'],
+      ];
+    }
+
+    $mail->htmlText = $body['html'];
+    $mail->plainText = $body['text'];
+
+    $attachments = civicrm_api3('Attachment', 'get', [
+      'return' => ['name', 'path'],
+      'entity_table' => 'civicrm_activity',
+      'entity_id' => $message['activity_id'],
+    ]);
+
+    foreach ($attachments['values'] as $attachment) {
+      $mail->addFileAttachment($attachment['path']);
+    }
+
+    $mail->build();
+
+    $options = new \ezcMailSmtpTransportOptions();
+    $options->connectionType = \ezcMailSmtpTransport::CONNECTION_TLS;
+    $transport = new \ezcMailSmtpTransport(
+      $message['mailutils_setting.smtp_server'],
+      $message['mailutils_setting.smtp_username'],
+      $message['mailutils_setting.smtp_password'],
+      $message['mailutils_setting.smtp_port'],
+      $options
+    );
+    $body = MessageParser::getBody($mail);
+    $headers = $mail->headers->getCaseSensitiveArray();
+    $send = TRUE;
+    if (defined('CIVICRM_MAIL_LOG')) {
+      $send = FALSE;
+
+      \Civi::log('mailutils')->debug(
+        'Simulating sending of MailutilsMessage ID=' . $message['id'],
+        ['headers' => $headers, 'body' => $body]
+      );
+      if (defined('CIVICRM_MAIL_LOG_AND_SEND')) {
+        $send = TRUE;
+      }
+    }
+    if ($send) {
+      try {
+        $transport->send($mail);
+      }
+      catch (\Exception $e) {
+        \Civi::log()->error('Error sending MailutilsMessage ID=' . $message['id'] . ': ' . $e->getMessage());
+        throw $e;
+      }
+    }
+    MailutilsMessage::update(FALSE)
+      ->addWhere('id', '=', $message['id'])
+      ->addValue('body', json_encode($body))
+      ->addValue('headers', json_encode($headers))
+      ->execute();
+
+    Activity::update(FALSE)
       ->addWhere('id', '=', $message['activity.id'])
       ->addValue('status_id', \CRM_Core_PseudoConstant::getKey(
         'CRM_Activity_BAO_Activity',

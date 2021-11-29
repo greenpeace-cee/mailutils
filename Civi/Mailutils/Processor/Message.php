@@ -2,8 +2,10 @@
 
 namespace Civi\Mailutils\Processor;
 
+use Civi\Api4\ActivityContact;
 use Civi\Api4\MailutilsMessage;
 use Civi\Api4\MailutilsMessageParty;
+use Civi\Mailutils\MessageParser;
 
 class Message {
 
@@ -18,18 +20,9 @@ class Message {
   }
 
   public function process() {
-    // TODO: extract into a shared ezcMail-to-MailutilsMessage library since we'll probably need this for outgoing too?
-    $body = [];
-    foreach ($this->mail->fetchParts() as $part) {
-      if ($part instanceof \ezcMailText) {
-        $body[] = [
-          'headers' => $part->headers->getCaseSensitiveArray(),
-          'text'    => $part->text,
-        ];
-      }
-    }
+    $body = MessageParser::getBody($this->mail);
 
-    $message = MailutilsMessage::create()
+    $message = MailutilsMessage::create(TRUE)
       ->addValue('activity_id', $this->activityId)
       ->addValue('message_id', $this->stripBrackets(
         $this->mail->getHeader('message-id')
@@ -48,7 +41,7 @@ class Message {
       ->first();
 
     // extract all involved parties and store as message parties
-    foreach (['from', 'to', 'cc', 'bcc'] as $partyTypeValue => $partyType) {
+    foreach (['from', 'to', 'cc', 'bcc'] as $partyType) {
       $parties = $this->mail->{$partyType};
       if (!is_array($parties)) {
         // 'from' contains a single ezcMailAddress, make it an array too
@@ -57,16 +50,35 @@ class Message {
 
       foreach ($parties as $party) {
         // TODO: set contact_id
-        // TODO: remove ugly $partyTypeValue hack once API4 properly supports pseudoconstants in some way
-        MailutilsMessageParty::create()
-          ->addValue('party_type_id', $partyTypeValue + 1)
+        MailutilsMessageParty::create(TRUE)
+          ->addValue('party_type_id:name', $partyType)
           ->addValue('name', $party->name)
           ->addValue('email', $party->email)
           ->addValue('mailutils_message_id', $message['id'])
+          ->addValue('contact_id', $this->getPartyContactId($partyType, $party->email))
           ->execute();
       }
     }
+  }
 
+  /**
+   * @throws \Exception
+   */
+  protected function getPartyContactId($partyType, $email) {
+    $activityContact = ActivityContact::get(FALSE)
+      ->addSelect('contact_id')
+      ->setJoin([
+        ['Email AS email', 'INNER', NULL, ['contact_id', '=', 'email.contact_id']],
+      ])
+      ->addWhere('activity_id', '=', $this->activityId)
+      ->addWhere('email.email', '=', $email)
+      ->addWhere('record_type_id:name', '=', ($partyType == 'from' ? 'Activity Source' : 'Activity Targets'))
+      ->execute()
+      ->first();
+    if (empty($activityContact['contact_id'])) {
+      throw new \Exception("Unable to determine party contact ID: partyType={$partyType}, activityId={$activityId}, email={$email}");
+    }
+    return $activityContact['contact_id'];
   }
 
   protected function stripBrackets(string $value) {
