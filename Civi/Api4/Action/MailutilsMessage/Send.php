@@ -89,7 +89,7 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
       }
     }
     $mail->subject = $message['subject'];
-    $mail->messageId = $message['message_id'];
+    $mail->messageId = '<' . $message['message_id'] . '>';
     if (!empty($message['in_reply_to'])) {
       $mail->setHeader('In-Reply-To', $message['in_reply_to']);
     }
