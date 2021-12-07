@@ -159,13 +159,12 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
       ->addValue('headers', json_encode($headers))
       ->execute();
 
+
+    $emptyAttachments = [];
     Activity::update(FALSE)
       ->addWhere('id', '=', $message['activity.id'])
-      ->addValue('status_id', \CRM_Core_PseudoConstant::getKey(
-        'CRM_Activity_BAO_Activity',
-        'status_id',
-        'Completed'
-      ))
+      ->addValue('status_id:name', 'Completed')
+      ->addValue('details', \CRM_Utils_Mail_Incoming::formatMailPart($mail->body, $emptyAttachments))
       ->execute();
 
     $result[] = ['message_status' => 'sent'];
