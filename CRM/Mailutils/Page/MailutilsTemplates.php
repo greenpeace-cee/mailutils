@@ -1,0 +1,25 @@
+<?php
+
+use Civi\Api4\MailutilsTemplate;
+use CRM_Mailutils_ExtensionUtil as E;
+
+class CRM_Mailutils_Page_MailutilsTemplates extends CRM_Core_Page {
+
+  public function run() {
+    // Example: Set the page-title dynamically; alternatively, declare a static title in xml/Menu/*.xml
+    // CRM_Utils_System::setTitle(E::ts('MailutilsTemplates'));
+
+    $mailutilsTemplates = MailutilsTemplate::get(FALSE)
+      ->addSelect('*', 'template_category_id:label')
+      ->addOrderBy('template_category_id:label', 'ASC')
+      ->addOrderBy('name', 'ASC')
+      ->execute();
+    foreach ($mailutilsTemplates as $id => $mailutilsTemplate) {
+      $mailutilsTemplates[$id]['category'] = $mailutilsTemplate['template_category_id:label'];
+    }
+    $this->assign('mailutilsTemplates', $mailutilsTemplates);
+
+    parent::run();
+  }
+
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/mailutils/template</path>
+    <page_callback>CRM_Mailutils_Page_MailutilsTemplates</page_callback>
+    <title>Mailutils Templates</title>
+    <access_arguments>access mailutils</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/mailutils/template/add</path>
+    <page_callback>CRM_Mailutils_Form_MailutilsTemplate</page_callback>
+    <title>Manage Mailutils Template</title>
+    <access_arguments>access mailutils</access_arguments>
+  </item>
+</menu>
