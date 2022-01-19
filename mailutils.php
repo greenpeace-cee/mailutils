@@ -173,14 +173,14 @@ function mailutils_civicrm_permission(&$permissions) {
 }
 
 function mailutils_civicrm_navigationMenu(&$menu) {
-  _mailingwork_civix_insert_navigation_menu($menu, 'Mailings', array(
+  _mailutils_civix_insert_navigation_menu($menu, 'Mailings', array(
     'label' => E::ts('Mailutils'),
     'name' => 'Mailutils',
     'permission' => 'access mailutils',
     'operator' => 'OR',
     'separator' => 2,
   ));
-  _mailingwork_civix_insert_navigation_menu($menu, 'Mailings/Mailutils', array(
+  _mailutils_civix_insert_navigation_menu($menu, 'Mailings/Mailutils', array(
     'label' => E::ts('Templates'),
     'name' => 'Mailutils_Templates',
     'url' => 'civicrm/mailutils/template',
@@ -188,5 +188,5 @@ function mailutils_civicrm_navigationMenu(&$menu) {
     'operator' => 'OR',
     'separator' => 0,
   ));
-  _mailingwork_civix_navigationMenu($menu);
+  _mailutils_civix_navigationMenu($menu);
 }
