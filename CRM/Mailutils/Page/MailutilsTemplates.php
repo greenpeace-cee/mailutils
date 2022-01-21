@@ -10,12 +10,14 @@ class CRM_Mailutils_Page_MailutilsTemplates extends CRM_Core_Page {
     // CRM_Utils_System::setTitle(E::ts('MailutilsTemplates'));
 
     $mailutilsTemplates = MailutilsTemplate::get(FALSE)
-      ->addSelect('*', 'template_category_id:label')
+      ->addSelect('*', 'template_category_id:label', 'support_case_category_id:label')
       ->addOrderBy('template_category_id:label', 'ASC')
+      ->addOrderBy('support_case_category_id:label', 'ASC')
       ->addOrderBy('name', 'ASC')
       ->execute();
     foreach ($mailutilsTemplates as $id => $mailutilsTemplate) {
-      $mailutilsTemplates[$id]['category'] = $mailutilsTemplate['template_category_id:label'];
+      $mailutilsTemplates[$id]['template_category'] = $mailutilsTemplate['template_category_id:label'];
+      $mailutilsTemplates[$id]['support_case_category'] = $mailutilsTemplate['support_case_category_id:label'];
     }
     $this->assign('mailutilsTemplates', $mailutilsTemplates);
 

@@ -22,4 +22,15 @@ class CRM_Mailutils_Upgrader extends CRM_Mailutils_Upgrader_Base {
     return TRUE;
   }
 
+  public function upgrade_1100() {
+    $this->ctx->log->info('Applying update 1100');
+    $column_exists = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_mailutils_template` LIKE 'support_case_category_id';");
+    if (!$column_exists) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_mailutils_template` ADD COLUMN `support_case_category_id` int unsigned NULL COMMENT 'Support Case Category'");
+      $logging = new CRM_Logging_Schema();
+      $logging->fixSchemaDifferences();
+    }
+    return TRUE;
+  }
+
 }

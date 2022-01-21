@@ -41,6 +41,20 @@ class CRM_Mailutils_Form_MailutilsTemplate extends CRM_Core_Form {
       $templateCategories,
       TRUE
     );
+
+    $supportCaseCategories = MailutilsTemplate::getFields(FALSE)
+      ->setLoadOptions(TRUE)
+      ->addSelect('options')
+      ->addWhere('name', '=', 'support_case_category_id')
+      ->execute()
+      ->first()['options'];
+    $this->add(
+      'select',
+      'support_case_category_id',
+      'Support Case Category',
+      ['' => 'All'] + $supportCaseCategories
+    );
+
     $this->add(
       'textarea',
       'message',
@@ -81,6 +95,7 @@ class CRM_Mailutils_Form_MailutilsTemplate extends CRM_Core_Form {
           'id' => $mailutilsTemplate['id'],
           'name' => $mailutilsTemplate['name'],
           'template_category_id' => $mailutilsTemplate['template_category_id'],
+          'support_case_category_id' => $mailutilsTemplate['support_case_category_id'],
           'message' => $mailutilsTemplate['message'],
         ];
       }
@@ -97,6 +112,7 @@ class CRM_Mailutils_Form_MailutilsTemplate extends CRM_Core_Form {
         ->addWhere('id', '=', $this->_id)
         ->addValue('name', $params['name'])
         ->addValue('template_category_id', $params['template_category_id'])
+        ->addValue('support_case_category_id', $params['support_case_category_id'] ?? 'NULL')
         ->addValue('message', $params['message'])
         ->execute();
     }
@@ -104,6 +120,7 @@ class CRM_Mailutils_Form_MailutilsTemplate extends CRM_Core_Form {
       $mailutilsTemplate = MailutilsTemplate::create(FALSE)
         ->addValue('name', $params['name'])
         ->addValue('template_category_id', $params['template_category_id'])
+        ->addValue('support_case_category_id', $params['support_case_category_id'] ?? 'NULL')
         ->addValue('message', $params['message'])
         ->execute()
         ->first();

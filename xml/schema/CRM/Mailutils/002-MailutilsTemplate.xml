@@ -45,6 +45,20 @@
   </field>
 
   <field>
+    <name>support_case_category_id</name>
+    <title>Support Case Category</title>
+    <type>int unsigned</type>
+    <required>false</required>
+    <comment>Support Case Category</comment>
+    <pseudoconstant>
+      <optionGroupName>support_case_category</optionGroupName>
+    </pseudoconstant>
+    <html>
+      <type>Select</type>
+    </html>
+  </field>
+
+  <field>
     <name>message</name>
     <title>Message</title>
     <type>text</type>

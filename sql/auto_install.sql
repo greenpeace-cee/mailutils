@@ -54,6 +54,7 @@ CREATE TABLE `civicrm_mailutils_template` (
   `id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'Unique MailutilsTemplate ID',
   `name` varchar(255) NOT NULL COMMENT 'Name',
   `template_category_id` int unsigned NOT NULL COMMENT 'Template Category',
+  `support_case_category_id` int unsigned NULL COMMENT 'Support Case Category',
   `message` text NOT NULL COMMENT 'Message',
   PRIMARY KEY (`id`)
 )
