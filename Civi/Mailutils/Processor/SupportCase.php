@@ -18,7 +18,7 @@ class SupportCase {
   }
 
   public function process() {
-    $activity = Activity::get()
+    $activity = Activity::get(FALSE)
       ->addWhere('id', '=', $this->activityId)
       ->addChain('contact', ActivityContact::get()
         ->addWhere('record_type_id', '=', 2)
@@ -27,7 +27,6 @@ class SupportCase {
       ->addChain('message', MailutilsMessage::get()
         ->addWhere('activity_id', '=', '$id'),
         0)
-      ->setCheckPermissions(FALSE)
       ->execute()
       ->first();
     $case_id = $this->getSupportCaseForThread($activity['message']['mailutils_thread_id']);
@@ -36,6 +35,7 @@ class SupportCase {
       $categoryField = \CRM_Core_BAO_CustomField::getCustomFieldID('category', \CRM_Supportcase_Install_Entity_CustomGroup::CASE_DETAILS, TRUE);
       // case subject only allows 128 characters, cut off with ellipsis if length is exceeded
       $subject = (strlen($activity['subject']) > 128) ? substr($activity['subject'], 0, 127) . '…' : $activity['subject'];
+      $subject = empty($subject) ? '(no subject)' : $subject;
       $case = civicrm_api3('Case', 'create', [
         'contact_id'   => $activity['contact']['contact_id'],
         'case_type_id' => 'support_case',
