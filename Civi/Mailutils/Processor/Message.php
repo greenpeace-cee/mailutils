@@ -2,6 +2,7 @@
 
 namespace Civi\Mailutils\Processor;
 
+use Civi\Api4\Activity;
 use Civi\Api4\ActivityContact;
 use Civi\Api4\MailutilsMessage;
 use Civi\Api4\MailutilsMessageParty;
@@ -49,7 +50,6 @@ class Message {
       }
 
       foreach ($parties as $party) {
-        // TODO: set contact_id
         MailutilsMessageParty::create(TRUE)
           ->addValue('party_type_id:name', $partyType)
           ->addValue('name', $party->name)
@@ -58,6 +58,17 @@ class Message {
           ->addValue('contact_id', $this->getPartyContactId($partyType, $party->email))
           ->execute();
       }
+    }
+
+    // adjust activity date to include seconds
+    if (!empty($this->mail->getHeader('Date'))) {
+      Activity::update(FALSE)
+        ->addWhere('id', '=', $this->activityId)
+        ->addValue(
+          'activity_date_time',
+          date('YmdHis', strtotime($this->mail->getHeader('Date')))
+        )
+        ->execute();
     }
   }
 
