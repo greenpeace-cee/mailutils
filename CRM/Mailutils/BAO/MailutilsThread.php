@@ -23,9 +23,8 @@ class CRM_Mailutils_BAO_MailutilsThread extends CRM_Mailutils_DAO_MailutilsThrea
     // the topmost match is the most accurate one.
     $parts = [];
 
-    // base query for finding a matching thread. normalized subject must match
-    // for all thread matching strategies
-    $baseQuery = "SELECT
+    // base query for finding a matching thread
+    $baseQueryWithoutSubject = "SELECT
                       DISTINCT thread.id
                   FROM
                       civicrm_mailutils_message message
@@ -37,6 +36,10 @@ class CRM_Mailutils_BAO_MailutilsThread extends CRM_Mailutils_DAO_MailutilsThrea
                       civicrm_mailutils_thread thread
                   ON
                       thread.id = message.mailutils_thread_id
+                  ";
+
+    // normalized subject must match for (almost) all thread matching strategies
+    $baseQuery = "{$baseQueryWithoutSubject}
                   WHERE
                       message.subject_normalized = '{$subject_normalized}'
                   ";
@@ -81,6 +84,15 @@ class CRM_Mailutils_BAO_MailutilsThread extends CRM_Mailutils_DAO_MailutilsThrea
         'String'
       );
       $parts[] = $baseQuery . "AND party.party_type_id = {$from_party_type} AND party.email = '{$from_email}'";
+    }
+
+    $headers = json_decode($params['headers'], TRUE) ?? [];
+    if (!empty($params['in_reply_to']) && !empty($headers['Auto-Submitted']) && is_array($headers['Auto-Submitted']) && in_array('auto-replied', $headers['Auto-Submitted'])) {
+      $in_reply_to = CRM_Utils_Type::escape(
+        $params['in_reply_to'],
+        'String'
+      );
+      $parts[] = $baseQueryWithoutSubject . "AND message.message_id = '{$in_reply_to}'";
     }
 
     // TODO: match based on References header
