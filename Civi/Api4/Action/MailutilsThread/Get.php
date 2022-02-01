@@ -35,7 +35,7 @@ class Get extends \Civi\Api4\Generic\DAOGetAction {
 
   private function getThreadIdsByContact($clause) {
     $threads = [];
-    $activities = \Civi\Api4\Activity::get()
+    $activities = \Civi\Api4\Activity::get(FALSE)
       ->setSelect([
         'mailutils_messages.mailutils_thread_id',
       ])

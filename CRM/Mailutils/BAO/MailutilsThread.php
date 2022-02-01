@@ -107,7 +107,7 @@ class CRM_Mailutils_BAO_MailutilsThread extends CRM_Mailutils_DAO_MailutilsThrea
 
     if (empty($thread_id)) {
       // no matching threads, create a new one
-      $thread_id = \Civi\Api4\MailutilsThread::create()
+      $thread_id = \Civi\Api4\MailutilsThread::create(FALSE)
         ->execute()
         ->first()['id'];
     }

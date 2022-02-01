@@ -20,11 +20,11 @@ class SupportCase {
   public function process() {
     $activity = Activity::get(FALSE)
       ->addWhere('id', '=', $this->activityId)
-      ->addChain('contact', ActivityContact::get()
+      ->addChain('contact', ActivityContact::get(FALSE)
         ->addWhere('record_type_id', '=', 2)
         ->addWhere('activity_id', '=', '$id'),
         0)
-      ->addChain('message', MailutilsMessage::get()
+      ->addChain('message', MailutilsMessage::get(FALSE)
         ->addWhere('activity_id', '=', '$id'),
         0)
       ->execute()

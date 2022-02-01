@@ -37,7 +37,7 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
         ['MailutilsSetting AS mailutils_setting', 'INNER', NULL, ['mail_setting_id', '=', 'mailutils_setting.mail_setting_id']],
         ['Activity AS activity', 'LEFT', NULL, ['activity_id', '=', 'activity.id']],
       ])
-      ->addChain('mailutils_message_parties', \Civi\Api4\MailutilsMessageParty::get()
+      ->addChain('mailutils_message_parties', \Civi\Api4\MailutilsMessageParty::get(FALSE)
         ->addSelect('*', 'party_type_id:name')
         ->addWhere('mailutils_message_id', '=', '$id')
       )

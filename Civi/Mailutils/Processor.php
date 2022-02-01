@@ -19,9 +19,8 @@ class Processor {
       'id' => $mailSettingId,
     ]);
 
-    $mailutilsSettings = MailutilsSetting::get()
+    $mailutilsSettings = MailutilsSetting::get(FALSE)
       ->addWhere('mail_setting_id', '=', $mailSettingId)
-      ->setCheckPermissions(FALSE)
       ->execute()
       ->first();
     if (!empty($mailutilsSettings)) {
