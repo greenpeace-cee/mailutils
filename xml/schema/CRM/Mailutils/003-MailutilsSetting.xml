@@ -120,4 +120,15 @@
     </html>
   </field>
 
+  <field>
+    <name>advanced_config</name>
+    <title>Advanced Configuration (JSON)</title>
+    <type>text</type>
+    <serialize>JSON</serialize>
+    <comment>Advanced Configuration Options as JSON</comment>
+    <html>
+      <type>Text</type>
+    </html>
+  </field>
+
 </table>

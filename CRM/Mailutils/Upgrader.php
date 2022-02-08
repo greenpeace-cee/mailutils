@@ -33,4 +33,15 @@ class CRM_Mailutils_Upgrader extends CRM_Mailutils_Upgrader_Base {
     return TRUE;
   }
 
+  public function upgrade_1101() {
+    $this->ctx->log->info('Applying update 1101');
+    $column_exists = CRM_Core_DAO::singleValueQuery("SHOW COLUMNS FROM `civicrm_mailutils_setting` LIKE 'advanced_config';");
+    if (!$column_exists) {
+      CRM_Core_DAO::executeQuery("ALTER TABLE `civicrm_mailutils_setting` ADD COLUMN `advanced_config` text COMMENT 'Advanced Configuration Options as JSON'");
+      $logging = new CRM_Logging_Schema();
+      $logging->fixSchemaDifferences();
+    }
+    return TRUE;
+  }
+
 }

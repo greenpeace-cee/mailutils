@@ -59,6 +59,7 @@ class SupportCase {
       'id' => $this->activityId,
       'case_id' => $case_id,
     ]);
+    return $case_id;
   }
 
   private static function getSupportCaseForThread($threadId) {

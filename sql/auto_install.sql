@@ -77,6 +77,7 @@ CREATE TABLE `civicrm_mailutils_setting` (
   `smtp_password` varchar(255) NULL COMMENT 'SMTP Password',
   `support_case_category_id` int unsigned NULL COMMENT 'Support Case Category',
   `from_email_address_id` int unsigned NOT NULL COMMENT 'From Email Address',
+  `advanced_config` text COMMENT 'Advanced Configuration Options as JSON',
   PRIMARY KEY (`id`),
   CONSTRAINT FK_civicrm_mailutils_setting_mail_setting_id FOREIGN KEY (`mail_setting_id`) REFERENCES `civicrm_mail_settings`(`id`) ON DELETE CASCADE,
   CONSTRAINT FK_civicrm_mailutils_setting_mailutils_template_id FOREIGN KEY (`mailutils_template_id`) REFERENCES `civicrm_mailutils_template`(`id`) ON DELETE SET NULL
