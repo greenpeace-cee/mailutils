@@ -153,6 +153,8 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
         throw $e;
       }
     }
+    // refresh body after sending; mailPart headers are only set after sending
+    $body = MessageParser::getBody($mail);
     MailutilsMessage::update(FALSE)
       ->addWhere('id', '=', $message['id'])
       ->addValue('body', json_encode($body))
