@@ -34,7 +34,7 @@ class SupportCase {
       // this is a new thread, create a case
       $categoryField = \CRM_Core_BAO_CustomField::getCustomFieldID('category', \CRM_Supportcase_Install_Entity_CustomGroup::CASE_DETAILS, TRUE);
       // case subject only allows 128 characters, cut off with ellipsis if length is exceeded
-      $subject = (strlen($activity['subject']) > 128) ? substr($activity['subject'], 0, 127) . '…' : $activity['subject'];
+      $subject = (strlen($activity['subject']) > 128) ? mb_strcut($activity['subject'], 0, 127) . '…' : $activity['subject'];
       $subject = empty($subject) ? '(no subject)' : $subject;
       $case = civicrm_api3('Case', 'create', [
         'contact_id'   => $activity['contact']['contact_id'],
