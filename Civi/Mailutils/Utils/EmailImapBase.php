@@ -12,12 +12,17 @@ abstract class EmailImapBase {
    * The connection instances
    */
   protected static $instances = [];
+
+  /**
+   * @var \CRM_Mailing_MailStore
+   */
   protected $connection;
+
   protected $mailutilsSetting;
   protected $mailSetting;
   protected $availableFolders;
   protected $selectedFolder;
-  const DEFAULT_FOLDER = '[Gmail]/All Mail';
+  const DEFAULT_FOLDER = 'INBOX';
 
   /**
    * @param $mailSettingId
@@ -168,8 +173,8 @@ abstract class EmailImapBase {
     $emails = $parser->parseMail($rawEmails);
 
     foreach ($emails as $email) {
-      if ($email->messageId !== $messageId) {
-        throw new \Exception("Double check is failed! Message id:" . $messageId);
+      if ($email->messageId !== '<' . $messageId . '>') {
+        throw new \Exception("Double check is failed! Message id: {$email->messageId} / {$messageId}");
       }
     }
   }
