@@ -4,7 +4,18 @@ namespace Civi\Api4\Action\MailutilsMessage;
 use Civi\Api4\Generic\BasicBatchAction;
 use Civi\Mailutils\Utils\EmailImap;
 
-class DeletePermanentlyEmails extends BasicBatchAction {
+/**
+ * Delete message permanently via IMAP
+ */
+class DeletePermanently extends BasicBatchAction {
+
+  /**
+   * Folder in which to look for the message
+   *
+   * @var string
+   * @required
+   */
+  protected $folder;
 
   public function __construct($entityName, $actionName) {
     parent::__construct($entityName, $actionName, '*');
@@ -28,7 +39,7 @@ class DeletePermanentlyEmails extends BasicBatchAction {
 
     try {
       $imap = EmailImap::getInstance($mailutilsMessage['mail_setting_id']);
-      $imap->setCurrentFolder("[Gmail]/All Mail");
+      $imap->setCurrentFolder($this->folder);
       $imap->deletePermanently($mailutilsMessage['message_id']);
     } catch (\Exception $e) {
       $result['status'] = 'error';
