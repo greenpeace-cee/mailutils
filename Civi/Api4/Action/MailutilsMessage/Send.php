@@ -6,6 +6,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\MailutilsMessage;
 use Civi\Mailutils\MessageParser;
+use Civi\Mailutils\Utils\EmailImap;
 
 /**
  * Send a message
@@ -72,19 +73,19 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
     foreach ($message['mailutils_message_parties'] as $messageParty) {
       switch ($messageParty['party_type_id:name']) {
         case 'from':
-          $mail->from = new \ezcMailAddress($messageParty['email'], $messageParty['name']);
+          $mail->from = new \ezcMailAddress($messageParty['email'], $messageParty['name'], 'utf-8');
           break;
 
         case 'to':
-          $mail->addTo(new \ezcMailAddress($messageParty['email'], $messageParty['name']));
+          $mail->addTo(new \ezcMailAddress($messageParty['email'], $messageParty['name'], 'utf-8'));
           break;
 
         case 'cc':
-          $mail->addCc(new \ezcMailAddress($messageParty['email'], $messageParty['name']));
+          $mail->addCc(new \ezcMailAddress($messageParty['email'], $messageParty['name'], 'utf-8'));
           break;
 
         case 'bcc':
-          $mail->addBcc(new \ezcMailAddress($messageParty['email'], $messageParty['name']));
+          $mail->addBcc(new \ezcMailAddress($messageParty['email'], $messageParty['name'], 'utf-8'));
           break;
       }
     }
@@ -122,7 +123,9 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
     $mail->build();
 
     $options = new \ezcMailSmtpTransportOptions();
-    $options->connectionType = \ezcMailSmtpTransport::CONNECTION_TLS;
+    if ($message['mailutils_setting.smtp_port'] == '587') {
+      $options->connectionType = \ezcMailSmtpTransport::CONNECTION_TLS;
+    }
     $transport = new \ezcMailSmtpTransport(
       $message['mailutils_setting.smtp_server'],
       $message['mailutils_setting.smtp_username'],
@@ -153,14 +156,17 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
         throw $e;
       }
     }
-    // refresh body after sending; mailPart headers are only set after sending
+    // refresh header/body; some headers are only set after sending
     $body = MessageParser::getBody($mail);
+    $headers = $mail->headers->getCaseSensitiveArray();
+    $imap = EmailImap::getInstance($message['mail_setting_id']);
+    $imap->setCurrentFolder('[Gmail]/Sent Mail');
+    $imap->append($mail, ['SEEN']);
     MailutilsMessage::update(FALSE)
       ->addWhere('id', '=', $message['id'])
       ->addValue('body', json_encode($body))
       ->addValue('headers', json_encode($headers))
       ->execute();
-
 
     $emptyAttachments = [];
     Activity::update(FALSE)

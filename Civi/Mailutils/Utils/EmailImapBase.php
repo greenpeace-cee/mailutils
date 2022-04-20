@@ -179,6 +179,10 @@ abstract class EmailImapBase {
     }
   }
 
+  public function append(\ezcMail $mail, array $flags = []) {
+    $this->connection->_transport->append($this->selectedFolder, $mail->generate(), $flags);
+  }
+
   protected function __clone() {}
   protected function __wakeup(){}
 
