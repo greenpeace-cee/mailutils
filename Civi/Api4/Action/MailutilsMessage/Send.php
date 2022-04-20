@@ -30,72 +30,46 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
    * @throws \Civi\API\Exception\UnauthorizedException
    */
   public function _run(Result $result) {
-    $message = MailutilsMessage::get(FALSE)
-      ->addSelect('*', 'mail_settings.*', 'mailutils_setting.*', 'activity.*')
-      ->setJoin([
-        ['MailSettings AS mail_settings', 'LEFT', NULL, ['mail_setting_id', '=', 'mail_settings.id']],
-        ['MailutilsSetting AS mailutils_setting', 'INNER', NULL, ['mail_setting_id', '=', 'mailutils_setting.mail_setting_id']],
-        ['Activity AS activity', 'LEFT', NULL, ['activity_id', '=', 'activity.id']],
-      ])
-      ->addChain('mailutils_message_parties', \Civi\Api4\MailutilsMessageParty::get(FALSE)
-        ->addSelect('*', 'party_type_id:name')
-        ->addWhere('mailutils_message_id', '=', '$id')
-      )
-      ->addWhere('id', '=', $this->messageId)
-      ->execute()
-      ->first();
-    $draftStatus = \CRM_Core_PseudoConstant::getKey(
-      'CRM_Activity_BAO_Activity',
-      'status_id',
-      'Draft'
-    );
-
-    if ($message['activity.status_id'] != $draftStatus) {
-      throw new \API_Exception(
-        'Cannot send message when activity status is not "Draft".',
-        3001
-      );
-    }
-
-    if (empty($message['mail_setting_id'])) {
-      throw new \API_Exception(
-        'Cannot fetch SMTP settings without mail_setting_id. (Patch to add global SMTP support welcome!)',
-        3002
-      );
-    }
+    $message = $this->getMessage();
+    $this->validateMessage($message);
 
     $options = new \ezcMailComposerOptions();
     $options->stripBccHeader = TRUE;
     $options->automaticImageInclude = FALSE;
 
     $mail = new \ezcMailComposer($options);
+    $charset = 'utf-8';
+    $mail->charset = $charset;
+    $mail->subjectCharset = $charset;
+    $mail->subject = $message['subject'];
+    $mail->messageId = '<' . $message['message_id'] . '>';
+
     foreach ($message['mailutils_message_parties'] as $messageParty) {
       switch ($messageParty['party_type_id:name']) {
         case 'from':
-          $mail->from = new \ezcMailAddress($messageParty['email'], $messageParty['name']);
+          $mail->from = new \ezcMailAddress($messageParty['email'], $messageParty['name'], $charset);
           break;
 
         case 'to':
-          $mail->addTo(new \ezcMailAddress($messageParty['email'], $messageParty['name']));
+          $mail->addTo(new \ezcMailAddress($messageParty['email'], $messageParty['name'], $charset));
           break;
 
         case 'cc':
-          $mail->addCc(new \ezcMailAddress($messageParty['email'], $messageParty['name']));
+          $mail->addCc(new \ezcMailAddress($messageParty['email'], $messageParty['name'], $charset));
           break;
 
         case 'bcc':
-          $mail->addBcc(new \ezcMailAddress($messageParty['email'], $messageParty['name']));
+          $mail->addBcc(new \ezcMailAddress($messageParty['email'], $messageParty['name'], $charset));
           break;
       }
     }
-    $mail->subject = $message['subject'];
-    $mail->messageId = '<' . $message['message_id'] . '>';
+
     if (!empty($message['in_reply_to'])) {
-      $mail->setHeader('In-Reply-To', $message['in_reply_to']);
+      $mail->setHeader('In-Reply-To', $message['in_reply_to'], $charset);
     }
     $headers = json_decode($message['headers'], TRUE);
     foreach ($headers as $name => $value) {
-      $mail->setHeader($name, $value);
+      $mail->setHeader($name, $value, $charset);
     }
 
     $body = json_decode($message['body'], TRUE);
@@ -170,6 +144,41 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
       ->execute();
 
     $result[] = ['message_status' => 'sent'];
+  }
+
+  private function getMessage() {
+    return MailutilsMessage::get(FALSE)
+      ->addSelect('*', 'mail_settings.*', 'mailutils_setting.*', 'activity.*')
+      ->setJoin([
+        ['MailSettings AS mail_settings', 'LEFT', NULL, ['mail_setting_id', '=', 'mail_settings.id']],
+        ['MailutilsSetting AS mailutils_setting', 'INNER', NULL, ['mail_setting_id', '=', 'mailutils_setting.mail_setting_id']],
+        ['Activity AS activity', 'LEFT', NULL, ['activity_id', '=', 'activity.id']],
+      ])
+      ->addChain('mailutils_message_parties', \Civi\Api4\MailutilsMessageParty::get(FALSE)
+        ->addSelect('*', 'party_type_id:name')
+        ->addWhere('mailutils_message_id', '=', '$id')
+      )
+      ->addWhere('id', '=', $this->messageId)
+      ->execute()
+      ->first();
+  }
+
+  private function validateMessage($message) {
+    $draftStatus = \CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'status_id', 'Draft');
+
+    if ($message['activity.status_id'] != $draftStatus) {
+      throw new \API_Exception(
+        'Cannot send message when activity status is not "Draft".',
+        3001
+      );
+    }
+
+    if (empty($message['mail_setting_id'])) {
+      throw new \API_Exception(
+        'Cannot fetch SMTP settings without mail_setting_id. (Patch to add global SMTP support welcome!)',
+        3002
+      );
+    }
   }
 
 }
