@@ -37,15 +37,9 @@ class DeletePermanently extends BasicBatchAction {
       'mail_setting_id' => $mailutilsMessage['mail_setting_id'],
     ];
 
-    try {
-      $imap = EmailImap::getInstance($mailutilsMessage['mail_setting_id']);
-      $imap->setCurrentFolder($this->folder);
-      $imap->deletePermanently($mailutilsMessage['message_id']);
-    } catch (\Exception $e) {
-      $result['status'] = 'error';
-      $result['message'] = 'Error via deleting message.  ' . $e->getMessage();
-      return $result;
-    }
+    $imap = EmailImap::getInstance($mailutilsMessage['mail_setting_id']);
+    $imap->setCurrentFolder($this->folder);
+    $imap->deletePermanently($mailutilsMessage['message_id']);
 
     //TODO: How we need handle errors?
     //TODO: do we need delete this MailutilsMessage row from db? Or set flag is_deleted = 1?

@@ -45,14 +45,9 @@ class CopyMessage extends BasicBatchAction {
       'mail_setting_id' => $mailutilsMessage['mail_setting_id'],
     ];
 
-    try {
-      $imap = EmailImap::getInstance($mailutilsMessage['mail_setting_id']);
-      $imap->setCurrentFolder($this->sourceFolder);
-      $imap->copyMessage($mailutilsMessage['message_id'], $this->destinationFolder);
-    } catch (\Exception $e) {
-      $result['status'] = 'error';
-      $result['message'] = 'Error copying message.  ' . $e->getMessage();
-    }
+    $imap = EmailImap::getInstance($mailutilsMessage['mail_setting_id']);
+    $imap->setCurrentFolder($this->sourceFolder);
+    $imap->copyMessage($mailutilsMessage['message_id'], $this->destinationFolder);
 
     return $result;
   }
