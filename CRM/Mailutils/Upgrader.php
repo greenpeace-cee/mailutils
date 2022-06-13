@@ -55,7 +55,8 @@ class CRM_Mailutils_Upgrader extends CRM_Mailutils_Upgrader_Base {
   public function upgrade_1102() {
     $this->ctx->log->info('Applying update 1102. Replaces me');
     MailutilsTemplateUpgrade::updateMessages([
-      '\n' => '<br>',
+      "\n" => '<br>',
+      "\r" => '',
     ]);
 
     return TRUE;
