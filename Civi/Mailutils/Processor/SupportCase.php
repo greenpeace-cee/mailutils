@@ -33,13 +33,11 @@ class SupportCase {
     if (empty($case_id)) {
       // this is a new thread, create a case
       $categoryField = \CRM_Core_BAO_CustomField::getCustomFieldID('category', \CRM_Supportcase_Install_Entity_CustomGroup::CASE_DETAILS, TRUE);
-      // case subject only allows 128 characters, cut off with ellipsis if length is exceeded
-      $subject = (strlen($activity['subject']) > 128) ? mb_strcut($activity['subject'], 0, 127) . '…' : $activity['subject'];
-      $subject = empty($subject) ? '(no subject)' : $subject;
+
       $case = civicrm_api3('Case', 'create', [
         'contact_id'   => $activity['contact']['contact_id'],
         'case_type_id' => 'support_case',
-        'subject'      => $subject,
+        'subject'      => $this->getCaseSubject($activity['subject']),
         'start_date'   => $activity['activity_date_time'],
         'status_id'    => 'Open',
         $categoryField => $this->supportCaseCategoryId,
@@ -60,6 +58,46 @@ class SupportCase {
       'case_id' => $case_id,
     ]);
     return $case_id;
+  }
+
+  /**
+   * Get case subject based on the email subject
+   *
+   * Case subject only allows 128 characters, cut off with ellipsis if length is
+   * exceeded
+   *
+   * @param $subject
+   *
+   * @return string
+   */
+  public static function getCaseSubject($subject): string {
+    if (empty($subject)) {
+      return '(no subject)';
+    }
+
+    $encodedLength = mb_strlen(str_replace(['<', '>'], ['&lt;', '&gt;'], $subject));
+    if ($encodedLength <= 128) {
+      return $subject;
+    }
+
+    // we can't use a naive mb_substr implementation because of encoding madness
+    // since we also don't want to cut in the middle of an HTML entity, we'll need
+    // to loop from 127 to 0 and see how many non-encoded characters we need to
+    // remove in order to reach a length of 128 when encoded
+    for ($i = 127; $i >= 0; $i--) {
+      $subject = mb_substr($subject, 0, $i);
+      // we need to replicate CRM_Utils_API_HTMLInputCoder's behaviour
+      // by replacing <> with the corresponding HTML entity as it will affect
+      // the final string length when persisting to DB
+      $encodedLength = mb_strlen(str_replace(['<', '>'], ['&lt;', '&gt;'], $subject));
+      if ($encodedLength <= 127) {
+        // the encoded subject string is now below the DB size limit, append
+        // ellipsis and return
+        return $subject . '…';
+      }
+    }
+    // this should never happen™
+    return '(no subject)';
   }
 
   private static function getSupportCaseForThread($threadId) {
