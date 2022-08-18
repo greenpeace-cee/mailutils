@@ -1,4 +1,6 @@
 <?php
+
+use Civi\Mailutils\Upgrade\MailutilsTemplateUpgrade;
 use CRM_Mailutils_ExtensionUtil as E;
 
 /**
@@ -41,6 +43,22 @@ class CRM_Mailutils_Upgrader extends CRM_Mailutils_Upgrader_Base {
       $logging = new CRM_Logging_Schema();
       $logging->fixSchemaDifferences();
     }
+    return TRUE;
+  }
+
+  /**
+   * Replaces '\n' to '<br>' at the 'message' field
+   * to the all of exist MailutilsTemplate items
+   *
+   * @return bool
+   */
+  public function upgrade_1102() {
+    $this->ctx->log->info('Applying update 1102. Replaces me');
+    MailutilsTemplateUpgrade::updateMessages([
+      "\n" => '<br>',
+      "\r" => '',
+    ]);
+
     return TRUE;
   }
 

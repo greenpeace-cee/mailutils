@@ -56,7 +56,7 @@ class CRM_Mailutils_Form_MailutilsTemplate extends CRM_Core_Form {
     );
 
     $this->add(
-      'textarea',
+      'wysiwyg',
       'message',
       'Message',
       [
