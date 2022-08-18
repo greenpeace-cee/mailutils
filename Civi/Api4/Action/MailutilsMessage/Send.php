@@ -179,6 +179,43 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
         3002
       );
     }
+
+    if (empty($message['subject'])) {
+      throw new \API_Exception('Subject is required field.', 3003);
+    }
+
+    if (empty($message['body'])) {
+      throw new \API_Exception('Email body is required field.', 3004);
+    } else {
+      $body = json_decode($message['body'], TRUE);
+      if (empty($body['html'])) {
+        throw new \API_Exception('Cannot read email body', 3005);
+      }
+    }
+
+    if (!empty($message['mailutils_message_parties'])) {
+      $isFromEmailsExist = false;
+      $isToEmailsExist = false;
+
+      foreach ($message['mailutils_message_parties'] as $email) {
+        if ($email['party_type_id:name'] === 'to') {
+          $isToEmailsExist = true;
+        }
+        if ($email['party_type_id:name'] === 'from') {
+          $isFromEmailsExist = true;
+        }
+      }
+
+      if (!$isFromEmailsExist) {
+        throw new \API_Exception('"From email" is required field.', 3007);
+      }
+
+      if (!$isToEmailsExist) {
+        throw new \API_Exception('"To email" is required field.', 3008);
+      }
+    } else {
+      throw new \API_Exception('Cannot find "To" and "From" emails.', 3006);
+    }
   }
 
 }
