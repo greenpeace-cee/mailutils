@@ -3,109 +3,83 @@
 use Civi\Api4\MailutilsTemplate;
 use CRM_Mailutils_ExtensionUtil as E;
 
-/**
- * Form controller class
- *
- * @see https://docs.civicrm.org/dev/en/latest/framework/quickform/
- */
 class CRM_Mailutils_Form_MailutilsTemplate extends CRM_Core_Form {
 
   protected $_id = NULL;
-
-  /**
-   * @var array|mixed
-   */
-  private $_values;
+  private $mailutilsTemplate = NULL;
 
   public function buildQuickForm() {
-    $this->add('hidden', 'id', $this->_id);
-    $this->add(
-      'text',
-      'name',
-      'Name',
-      [
-        'class' => 'huge'
-      ],
-      TRUE
-    );
     $templateCategories = MailutilsTemplate::getFields(FALSE)
       ->setLoadOptions(TRUE)
       ->addSelect('options')
       ->addWhere('name', '=', 'template_category_id')
       ->execute()
       ->first()['options'];
-    $this->add(
-      'select',
-      'template_category_id',
-      'Template Category',
-      $templateCategories,
-      TRUE
-    );
-
     $supportCaseCategories = MailutilsTemplate::getFields(FALSE)
       ->setLoadOptions(TRUE)
       ->addSelect('options')
       ->addWhere('name', '=', 'support_case_category_id')
       ->execute()
       ->first()['options'];
-    $this->add(
-      'select',
-      'support_case_category_id',
-      'Support Case Category',
-      ['' => 'All'] + $supportCaseCategories
-    );
 
-    $this->add(
-      'wysiwyg',
-      'message',
-      'Message',
+    $this->add('hidden', 'id', $this->_id);
+    $this->add('text', 'name', 'Name', ['class' => 'huge'], TRUE);
+    $this->add('select', 'template_category_id', 'Template Category', $templateCategories, TRUE);
+    $this->add('select', 'support_case_category_id', 'Support Case Category', ['' => 'All'] + $supportCaseCategories);
+    $this->add('wysiwyg', 'message', 'Message', ['class' => 'huge'], TRUE);
+    $this->addButtons([
       [
-        'class' => 'huge'
-      ],
-      TRUE
-    );
-    $this->addButtons(array(
-      array(
         'type' => 'submit',
         'name' => E::ts('Save'),
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+      [
+        'type' => 'cancel',
+        'name' => E::ts('Cancel'),
+        'class' => 'cancel',
+      ]
+    ]);
 
     // export form elements
     $this->assign('elementNames', $this->getRenderableElementNames());
+    $this->assign('startSmartyEscapeWord', CRM_Mailutils_Utils_MessageHandler::START_SMARTY_ESCAPE_WORD);
+    $this->assign('endSmartyEscapeWord', CRM_Mailutils_Utils_MessageHandler::END_SMARTY_ESCAPE_WORD);
     parent::buildQuickForm();
   }
 
+  public function cancelAction() {
+    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/mailutils/template'));
+  }
+
   public function setDefaultValues() {
-    return $this->_values;
+    $defaultValues = [];
+
+    if (!empty($this->mailutilsTemplate)) {
+      $defaultValues['id'] = $this->mailutilsTemplate['id'];
+      $defaultValues['name'] = $this->mailutilsTemplate['name'];
+      $defaultValues['template_category_id'] = $this->mailutilsTemplate['template_category_id'];
+      $defaultValues['support_case_category_id'] = $this->mailutilsTemplate['support_case_category_id'];
+      $defaultValues['message'] = $this->mailutilsTemplate['message'];
+    }
+
+    return $defaultValues;
   }
 
   public function preProcess() {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive');
-    $this->_values = $this->get('values');
-    if (!is_array($this->_values)) {
-      $this->_values = [];
-      if (!empty($this->_id)) {
-        $mailutilsTemplate = MailutilsTemplate::get(FALSE)
-          ->addWhere('id', '=', $this->_id)
-          ->execute()
-          ->first();
-        $this->_values = [
-          'id' => $mailutilsTemplate['id'],
-          'name' => $mailutilsTemplate['name'],
-          'template_category_id' => $mailutilsTemplate['template_category_id'],
-          'support_case_category_id' => $mailutilsTemplate['support_case_category_id'],
-          'message' => $mailutilsTemplate['message'],
-        ];
-      }
-      $this->set('values', $this->_values);
-    }
 
+    if (!empty($this->_id)) {
+      $this->mailutilsTemplate = MailutilsTemplate::get(FALSE)
+        ->addWhere('id', '=', $this->_id)
+        ->execute()
+        ->first();
+    }
   }
 
   public function postProcess() {
     $params = $this->exportValues();
+    $preparedMessage = CRM_Mailutils_Utils_MessageHandler::prepareMessage($params['message']);
+
     if (!empty($params['id'])) {
       $this->_id = $params['id'];
       MailutilsTemplate::update(FALSE)
@@ -113,7 +87,7 @@ class CRM_Mailutils_Form_MailutilsTemplate extends CRM_Core_Form {
         ->addValue('name', $params['name'])
         ->addValue('template_category_id', $params['template_category_id'])
         ->addValue('support_case_category_id', $params['support_case_category_id'] ?? 'NULL')
-        ->addValue('message', $params['message'])
+        ->addValue('message', $preparedMessage)
         ->execute();
     }
     else {
@@ -121,7 +95,7 @@ class CRM_Mailutils_Form_MailutilsTemplate extends CRM_Core_Form {
         ->addValue('name', $params['name'])
         ->addValue('template_category_id', $params['template_category_id'])
         ->addValue('support_case_category_id', $params['support_case_category_id'] ?? 'NULL')
-        ->addValue('message', $params['message'])
+        ->addValue('message', $preparedMessage)
         ->execute()
         ->first();
       $this->_id = $mailutilsTemplate['id'];
