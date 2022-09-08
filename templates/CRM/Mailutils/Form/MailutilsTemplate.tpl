@@ -21,31 +21,31 @@
             You need to escape smarty code.<br>
             To do that use those word before/after smarty code:
           </p>
-          <p><b>{$startSmartyEscapeWord}</b> - start word</p>
-          <p><b>{$endSmartyEscapeWord}</b> - end word</p>
+          <p>{$startSmartyEscapeWord} - start word</p>
+          <p>{$endSmartyEscapeWord} - end word</p>
           <p>Example:</p>
           <p>
-            <b>{$startSmartyEscapeWord}</b>
+            {$startSmartyEscapeWord}
             {literal}
-              <i>{if $variable}</i>
+              {if $variable}
             {/literal}
-            <b>{$endSmartyEscapeWord}</b>
+            {$endSmartyEscapeWord}
 
-            <span>&lt;p&gt;&lt;i&gt;variable is exist&nbsp;&lt;/i&gt;&lt;/p&gt; </span>
+            <span>variable is exist</span>
 
-            <b>{$startSmartyEscapeWord}</b>
+            {$startSmartyEscapeWord}
             {literal}
-              <i>{else}</i>
+              {else}
             {/literal}
-            <b>{$endSmartyEscapeWord}</b>
+            {$endSmartyEscapeWord}
 
-            <span>&lt;p&gt;&lt;i&gt;variable doesn't exist&nbsp;&lt;/i&gt;&lt;/p&gt;</span>
+            variable doesn't exist
 
-            <b>{$startSmartyEscapeWord}</b>
+            {$startSmartyEscapeWord}
               {literal}
-                <i>{/if}</i>
+                {/if}
               {/literal}
-            <b>{$endSmartyEscapeWord}</b>
+            {$endSmartyEscapeWord}
           </p>
         </div>
       </div>

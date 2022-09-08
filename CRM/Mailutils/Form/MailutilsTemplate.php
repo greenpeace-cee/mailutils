@@ -78,7 +78,7 @@ class CRM_Mailutils_Form_MailutilsTemplate extends CRM_Core_Form {
 
   public function postProcess() {
     $params = $this->exportValues();
-    $preparedMessage = CRM_Mailutils_Utils_MessageHandler::prepareMessage($params['message']);
+    $preparedMessage = CRM_Mailutils_Utils_MessageHandler::prepareToSaveMessage($params['message']);
 
     if (!empty($params['id'])) {
       $this->_id = $params['id'];
