@@ -67,10 +67,8 @@ class CRM_Mailutils_Utils_MessageHandler {
           '<br />',
           '<p>',
           '</p>',
-          '\r\n',
-          '\n',
-          '
-',// is is not a format issue it is new line, TODO: can it replace to some code?
+          "\r\n",
+          "\n",
         ],'', $match);
         $message = str_replace($match, $fixedString, $message);
       }
