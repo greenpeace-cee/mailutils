@@ -38,7 +38,7 @@ class CRM_Mailutils_Utils_MessageHandler {
    * @return string
    */
   public static function getRegExpression(): string {
-    return'/' . self::START_SMARTY_ESCAPE_WORD .'.[^' . self::START_SMARTY_ESCAPE_WORD .'][^' . self::END_SMARTY_ESCAPE_WORD .']*' . self::END_SMARTY_ESCAPE_WORD .'/m';
+    return '/' . self::START_SMARTY_ESCAPE_WORD . '((?!' . self::END_SMARTY_ESCAPE_WORD . ')(?!' . self::START_SMARTY_ESCAPE_WORD . ')(.|\s))*' . self::END_SMARTY_ESCAPE_WORD .'/m';
   }
 
   /**
