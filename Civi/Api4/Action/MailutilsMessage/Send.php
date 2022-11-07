@@ -6,6 +6,7 @@ use Civi\Api4\Activity;
 use Civi\Api4\Generic\Result;
 use Civi\Api4\MailutilsMessage;
 use Civi\Mailutils\MessageParser;
+use Civi\Mailutils\SubjectNormalizer;
 
 /**
  * Send a message
@@ -181,6 +182,10 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
     }
 
     if (empty($message['subject'])) {
+      throw new \API_Exception('Subject is required field.', 3003);
+    }
+
+    if (empty(SubjectNormalizer::normalize($message['subject']))) {
       throw new \API_Exception('Subject is required field.', 3003);
     }
 
