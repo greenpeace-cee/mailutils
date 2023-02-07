@@ -7,6 +7,7 @@ use Civi\Api4\ActivityContact;
 use Civi\Api4\MailutilsMessage;
 use Civi\Api4\MailutilsMessageParty;
 use Civi\Mailutils\MessageParser;
+use Civi\Mailutils\Utils\StringHelper;
 
 class Message {
 
@@ -52,7 +53,7 @@ class Message {
       foreach ($parties as $party) {
         MailutilsMessageParty::create(TRUE)
           ->addValue('party_type_id:name', $partyType)
-          ->addValue('name', $party->name)
+          ->addValue('name', StringHelper::isValidUTF8Format($party->name) ? $party->name : null)
           ->addValue('email', $party->email)
           ->addValue('mailutils_message_id', $message['id'])
           ->addValue('contact_id', $this->getPartyContactId($partyType, $party->email))
