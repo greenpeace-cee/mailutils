@@ -108,7 +108,7 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
     $body = MessageParser::getBody($mail);
     $headers = $mail->headers->getCaseSensitiveArray();
     $send = TRUE;
-    if (defined('CIVICRM_MAIL_LOG')) {
+    if (defined('CIVICRM_MAIL_LOG') && !defined('CIVICRM_MAIL_LOG_AND_SEND')) {
       $send = FALSE;
 
       \Civi::log('mailutils')->debug(

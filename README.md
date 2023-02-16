@@ -1,17 +1,15 @@
 # mailutils
 
-mailutils adds various essential email client features to CiviCRM:
-
-* Reply or forward messages
-* Threading
-* Search
+mailutils provides a framework for email clients in CiviCRM. It is typically
+used in combination with other extensions like [supportcase](https://github.com/greenpeace-cee/supportcase).
 
 The extension is licensed under [AGPL-3.0](LICENSE.txt).
 
 ## Requirements
 
-* PHP v7.2+
-* CiviCRM 5.39+
+* PHP v7.4+
+* CiviCRM 5.57+
+* [at.greenpeace.casetools](https://github.com/greenpeace-cee/at.greenpeace.casetools) 0.1-beta.1+
 
 ## Installation (Web UI)
 
@@ -40,24 +38,47 @@ cv en mailutils
 ## Core Patch
 
 This extension currently requires the core patch located in `GP-9999.patch`
-to be applied.
+to be applied. Depending on your CMS and path layout, some variation of this
+should work:
+
+```bash
+cd <site-root>/sites/all/modules/civicrm
+patch -p1 < ../../../default/files/civicrm/ext/mailutils/GP-9999.patch
+```
 
 ## Configuration
 
 Mailutils expands the "Mail Accounts" feature in CiviCRM. To get started, first
-set up a mail account (preferably IMAP) with Email-to-Activity processing.
+set up a **IMAP** mail account with Email-to-Activity processing. Refer
+to the [relevant section of the CiviCRM System Administrator Guide](https://docs.civicrm.org/sysadmin/en/latest/setup/civimail/inbound/#autofiling-email-activities-via-emailprocessor)
+for details. Make sure to keep "Skip emails which do not have a Case ID or Case hash"
+and "Do not create new contacts when filing emails" unchecked.
 
-Additionally, we recommend setting up SMTP for the mail account. When a mail
-account is configured with SMTP, Mailutils will use the configured SMTP server
-rather than the global SMTP server CiviCRM is configured with. This ensures
-that outbound email is added to the "Sent" folder and thus visible to other
-mail clients.
+After configuring the Mail Account in CiviCRM, you need to perform some additional
+configuration in `mailutils` so the extension knows how to process and send
+emails for this account. There is no UI for this at the moment, but you can
+use API4 to create the setting record. Using the command-line, your configuration
+may look like this:
 
-You may also want to configure integration with the supportcase extension and
-set a from email address fo the mail account. A full configuration example
-may look as follows:
+```bash
+cv api4 MailutilsSetting.create +v mail_setting_id=1 +v support_case_category_id:name=without_category +v from_email_address_id=1 +v smtp_server=example.com +v smtp_port=587 +v smtp_username=user@example.com +v smtp_password=secret
+```
 
-    cv api4 MailutilsSetting.create +v mail_setting_id=1 +v support_case_category_id:name=without_category +v from_email_address_id=1 +v smtp_server=example.com +v smtp_port=465 +v smtp_username=user@example.com +v smtp_password=secret
+* `mail_setting_id`: This is the ID of the mail account you configured in the previous step.
+  If you want to configure multiple mail accounts, you'll need to repeat this step with each ID.
+* `support_case_category_id:name`: If you want to use this extension with the `supportcase`
+  extension, setting this value causes inbound emails to be processed as Support Cases and filed
+  under the provided Support Case Category. Custom categories can be created via the corresponding
+  Option Group. Support Case Categories can be used in various ways depending on how you organize
+  your public email addresses - for example, you may have separate categories (and email addresses)
+  for donor support and press requests.
+* `from_email_address_id`: This is the sender name and address (or rather the corresponding Option Group value)
+  that will be used when sending emails in this inbox. You may need to create the From Email Address via
+  Administer > Communications > FROM Email Addresses.
+* `smtp_server`, `smtp_username` and `smtp_password`: This SMTP server will be used to send emails.
+  TLS support is currently required for all connections (not StartTLS).
+* `mailutils_template_id`: ID of the default template that should be used when composing emails
+  in this inbox. Templates can be managed via Mailings > Mailutils > Templates.
 
 ### Settings
 
@@ -71,13 +92,5 @@ If no value is set, the global default location type will be used.
 
 ## Usage
 
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
-
-## Known Issues
-
-### Missing Features
-
-* Token support in emails
-* Message templates
-* Attachments
-
+This extension provides a framework that can be used by other extensions. Users
+will mostly interact with extensions like `supportcase` that use this framework.
