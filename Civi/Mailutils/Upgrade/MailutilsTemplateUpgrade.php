@@ -15,14 +15,14 @@ class MailutilsTemplateUpgrade {
    * @return void
    */
   public static function updateMessages($replaceOptions) {
-    $mailutilsTemplates = MailutilsTemplate::get()->execute();
+    $mailutilsTemplates = MailutilsTemplate::get(FALSE)->execute();
 
     foreach ($mailutilsTemplates as $mailutilsTemplate) {
       $message = $mailutilsTemplate['message'];
       $updatedMessage = StringHelper::searchAndReplace($mailutilsTemplate['message'], $replaceOptions);
 
       if ($updatedMessage !== $message) {
-        MailutilsTemplate::update()
+        MailutilsTemplate::update(FALSE)
           ->addWhere('id', '=', $mailutilsTemplate['id'])
           ->addValue('message', $updatedMessage)
           ->execute();
