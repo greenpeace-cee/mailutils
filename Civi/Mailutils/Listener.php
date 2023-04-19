@@ -80,10 +80,11 @@ class Listener {
    * @param \Civi\Core\Event\GenericHookEvent $event
    */
   public static function apiWrappers(GenericHookEvent $event) {
+
     $params = $event->getHookValues();
     if (!empty($params['1']) && !empty($params['1']['entity']) && !empty($params['1']['action']) && !empty($params['1']['wrappers']) ) {
       if ($params['1']['entity'] === 'Activity' && $params['1']['action'] === 'create') {
-        $params['1']['wrappers'][] = new ActivityWrapper();
+        $event->wrappers[] = new ActivityWrapper();
       }
     }
   }

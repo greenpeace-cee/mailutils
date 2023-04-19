@@ -32,6 +32,11 @@ function mailutils_civicrm_config(&$config) {
     'Civi\Mailutils\Listener::emailProcessorContact',
     PHP_INT_MAX - 1
   );
+  Civi::dispatcher()->addListener(
+    'hook_civicrm_apiWrappers',
+    'Civi\Mailutils\Listener::apiWrappers',
+    PHP_INT_MAX - 1
+  );
 }
 
 /**
