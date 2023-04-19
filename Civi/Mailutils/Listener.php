@@ -4,6 +4,7 @@ namespace Civi\Mailutils;
 
 use Civi\Core\Event\GenericHookEvent;
 use Civi\Core\Event\PreEvent;
+use Civi\Mailutils\Wrapper\ActivityWrapper;
 
 class Listener {
 
@@ -72,4 +73,19 @@ class Listener {
       self::$newEmails[] = $event->email;
     }
   }
+
+  /**
+   * Process apiWrappers
+   *
+   * @param \Civi\Core\Event\GenericHookEvent $event
+   */
+  public static function apiWrappers(GenericHookEvent $event) {
+    $params = $event->getHookValues();
+    if (!empty($params['1']) && !empty($params['1']['entity']) && !empty($params['1']['action']) && !empty($params['1']['wrappers']) ) {
+      if ($params['1']['entity'] === 'Activity' && $params['1']['action'] === 'create') {
+        $params['1']['wrappers'][] = new ActivityWrapper();
+      }
+    }
+  }
+
 }
