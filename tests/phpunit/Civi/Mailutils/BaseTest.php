@@ -28,7 +28,7 @@ abstract class BaseTest extends TestCase implements HeadlessInterface, HookInter
       ->apply();
   }
 
-  public function setUp() {
+  public function setUp(): void {
     parent::setUp();
     $domain = $this->callAPISuccess('Domain', 'getvalue', [
       'return' => 'id',
@@ -45,7 +45,7 @@ abstract class BaseTest extends TestCase implements HeadlessInterface, HookInter
     ]);
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     \CRM_Utils_File::cleanDir(self::FIXTURE_PATH . '/maildir');
     parent::tearDown();
   }

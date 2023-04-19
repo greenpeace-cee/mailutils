@@ -19,7 +19,7 @@ class SubjectNormalizerTest extends \PHPUnit\Framework\TestCase implements Headl
       ->apply();
   }
 
-  public function tearDown() {
+  public function tearDown(): void {
     parent::tearDown();
   }
 

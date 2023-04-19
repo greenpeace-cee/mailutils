@@ -26,12 +26,11 @@ class ProcessorTest extends BaseTest {
       'Should create activity for inbound email'
     );
     $activity = reset($activity['values']);
-    $this->assertContains(
+    $this->assertStringContainsString(
       'Message body',
       $activity['details'],
       'Activity should have details with message body'
     );
-
     $mailutilsMessages = MailutilsMessage::get()
       ->addWhere('activity_id', '=', $activity['id'])
       ->execute();
@@ -52,7 +51,8 @@ class ProcessorTest extends BaseTest {
     copy(self::FIXTURE_PATH . '/maildir_template/sample.txt', self::FIXTURE_PATH . '/maildir/sample.txt');
     $this->callAPISuccess('job', 'fetch_activities');
     $threads = \Civi\Api4\MailutilsThread::get()
-      ->addWhere('mailutils_messages.subject', '=', self::FIXTURE_SUBJECT)
+      ->addJoin('MailutilsMessage AS mailutils_message', 'INNER', ['id', '=', 'mailutils_message.mailutils_thread_id'])
+      ->addWhere('mailutils_message.subject', '=', self::FIXTURE_SUBJECT)
       ->execute();
     $this->assertEquals(1, $threads->count());
     $thread = $threads->first();
@@ -66,26 +66,55 @@ class ProcessorTest extends BaseTest {
     copy(self::FIXTURE_PATH . '/maildir_template/sample.txt', self::FIXTURE_PATH . '/maildir/sample.txt');
     $this->callAPISuccess('job', 'fetch_activities');
     $parties = \Civi\Api4\MailutilsMessageParty::get()
-      ->addWhere('mailutils_message.subject', '=', self::FIXTURE_SUBJECT)
+      ->addWhere('mailutils_message_id.subject', '=', self::FIXTURE_SUBJECT)
       ->setLimit(25)
       ->execute();
     $this->assertEquals(2, $parties->count(), 'Should have two involved parties');
     // test that From is extracted
     $from = \Civi\Api4\MailutilsMessageParty::get()
-      ->addWhere('mailutils_message.subject', '=', self::FIXTURE_SUBJECT)
+      ->addWhere('mailutils_message_id.subject', '=', self::FIXTURE_SUBJECT)
       ->addWhere('party_type_id:name', '=', 'from')
       ->execute()
       ->first();
     $this->assertEquals('my@example.com', $from['email']);
     // Test that To is extracted
     $to = \Civi\Api4\MailutilsMessageParty::get()
-      ->addWhere('mailutils_message.subject', '=', self::FIXTURE_SUBJECT)
+      ->addWhere('mailutils_message_id.subject', '=', self::FIXTURE_SUBJECT)
       ->addWhere('party_type_id:name', '=', 'to')
       ->execute()
       ->first();
     $this->assertEquals('b.2.1.aaaaaaaaaaaaaaaa@example.com', $to['email']);
     // TODO: test contact_id
     // TODO: test CC, BCC
+  }
+
+  /**
+   * Test that long subjects are truncated
+   */
+  public function testLongSubject() {
+    copy(self::FIXTURE_PATH . '/maildir_template/sample_long_subject.txt', self::FIXTURE_PATH . '/maildir/sample_long_subject.txt');
+    $this->callAPISuccess('job', 'fetch_activities');
+    $activity = $this->callAPISuccess('Activity', 'get', [
+      'subject' => 'Re: Sample message with a very very long subject that exceeds 255 characters . Lorem ipsum dolor sitLorem ipsum dolor sit amet, consectetur adipiscing eliLorem ipsum dolor sit amet, consectetur adipiscing eliLorem ipsum dolor sit amet, consectetur adipis…',
+    ]);
+    $this->assertEquals(
+      1,
+      $activity['count'],
+      'Should create activity for inbound email'
+    );
+    $activity = reset($activity['values']);
+    $this->assertStringContainsString(
+      'Message body',
+      $activity['details'],
+      'Activity should have details with message body'
+    );
+    $mailutilsMessages = MailutilsMessage::get()
+      ->addWhere('activity_id', '=', $activity['id'])
+      ->execute();
+    $this->assertEquals(1, $mailutilsMessages->count());
+    $message = $mailutilsMessages->first();
+    $this->assertEquals('Re: Sample message with a very very long subject that exceeds 255 characters . Lorem ipsum dolor sitLorem ipsum dolor sit amet, consectetur adipiscing eliLorem ipsum dolor sit amet, consectetur adipiscing eliLorem ipsum dolor sit amet, consectetur adip...', $message['subject']);
+    $this->assertEquals('Sample message with a very very long subject that exceeds 255 characters . Lorem ipsum dolor sitLorem ipsum dolor sit amet, consectetur adipiscing eliLorem ipsum dolor sit amet, consectetur adipiscing eliLorem ipsum dolor sit amet, consectetur adipisci...', $message['subject_normalized']);
   }
 
 }
