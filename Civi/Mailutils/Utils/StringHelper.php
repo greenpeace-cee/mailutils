@@ -25,4 +25,20 @@ class StringHelper {
     return str_replace($searchStrings, $replaceStrings, $string);
   }
 
+  /**
+   * @param $string
+   * @return boolean
+   */
+  public static function isValidUTF8Format($string) {
+    if (empty($string)) {
+      return false;
+    }
+
+    if (preg_match('//u', $string) === 1) {
+      return true;
+    }
+
+    return false;
+  }
+
 }
