@@ -58,11 +58,9 @@ function mailutils_civicrm_enable() {
 }
 
 function mailutils_civicrm_permission(&$permissions) {
-  $permissions += [
-    'access mailutils' => [
-      E::ts('Access Mail Utilities'),
-      E::ts('Grants the necessary permissions to access the CiviCRM mailutils extension'),
-    ],
+  $permissions['access mailutils'] = [
+    'label' => E::ts('Access Mail Utilities'),
+    'description' => E::ts('Grants the necessary permissions to access the CiviCRM mailutils extension'),
   ];
 }
 
