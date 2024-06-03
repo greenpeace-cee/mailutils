@@ -6,7 +6,7 @@ use CRM_Mailutils_ExtensionUtil as E;
 /**
  * Collection of upgrade steps.
  */
-class CRM_Mailutils_Upgrader extends CRM_Mailutils_Upgrader_Base {
+class CRM_Mailutils_Upgrader extends CRM_Extension_Upgrader_Base {
 
   public function upgrade_1000() {
     $this->ctx->log->info('Applying update 1000');
