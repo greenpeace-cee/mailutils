@@ -1,0 +1,19 @@
+name: "Run unit tests"
+
+on: ["push"]
+
+jobs:
+  install:
+    uses: greenpeace-cee/civi-ci/.github/workflows/unit-tests.yml@main
+  run-tests:
+    needs: install
+    steps:
+      - id: "run-tests"
+
+        name: "Run unit tests"
+        env:
+          EXT_DIR: "/home/runner/buildkit/build/civi/web/sites/default/files/civicrm/ext"
+        run: |
+          PATH="/home/runner/buildkit/bin:$PATH"
+          cd "$EXT_DIR/mailutils"
+          CIVICRM_UF="UnitTests" phpunit9
