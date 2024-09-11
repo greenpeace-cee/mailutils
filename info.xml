@@ -21,7 +21,7 @@
     <ext>at.greenpeace.casetools</ext>
   </requires>
   <compatibility>
-    <ver>5.57</ver>
+    <ver>5.69</ver>
   </compatibility>
   <comments/>
   <classloader>
