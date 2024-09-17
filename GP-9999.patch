@@ -1,14 +1,64 @@
+From 7787a3df767c7a5bcd3448e975333042bfad92c3 Mon Sep 17 00:00:00 2001
+From: Patrick Figel <pfigel@greenpeace.org>
+Date: Wed, 5 Jun 2024 16:52:11 +0200
+Subject: [PATCH] Add mailSettingId parameter to emailProcessor hook
+
+This adds a new mailSettingId parameter to the emailProcessor hook.
+
+The emailProcessor hook is called after inbound emails are processed
+and provides parameters related to the email and result/created entity.
+
+However, there is currently no way to figure out which mail setting
+(mail account)  the email relates to - the created entities themselves
+don't include a FK to the mail setting, and the mail object itself
+does not help either since it doesn't give us access to the (trusted)
+mail envelope which would contain the canonical From/To header.
+---
+ CRM/Utils/Hook.php                                         | 6 ++++--
+ CRM/Utils/Mail/EmailProcessor.php                          | 4 ++--
+ tests/phpunit/CRM/Utils/Mail/EmailProcessorInboundTest.php | 3 ++-
+ 3 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/CRM/Utils/Hook.php b/CRM/Utils/Hook.php
+index 33394d572425..d0c45f8e1dbb 100644
+--- a/CRM/Utils/Hook.php
++++ b/CRM/Utils/Hook.php
+@@ -1675,13 +1675,15 @@ public static function findDuplicates($dedupeParams, &$dedupeResults, $contextPa
+    * @param array &$result the result returned by the api call
+    * @param string $action
+    *   (optional ) the requested action to be performed if the types was 'mailing'.
++   * @param int|null $mailSettingId
++   *   The MailSetting ID the email relates to
+    *
+    * @return mixed
+    */
+-  public static function emailProcessor($type, &$params, $mail, &$result, $action = NULL) {
++  public static function emailProcessor($type, &$params, $mail, &$result, $action = NULL, int $mailSettingId = NULL) {
+     $null = NULL;
+     return self::singleton()
+-      ->invoke(['type', 'params', 'mail', 'result', 'action'], $type, $params, $mail, $result, $action, $null, 'civicrm_emailProcessor');
++      ->invoke(['type', 'params', 'mail', 'result', 'action', 'mailSettingId'], $type, $params, $mail, $result, $action, $mailSettingId, 'civicrm_emailProcessor');
+   }
+ 
+   /**
 diff --git a/CRM/Utils/Mail/EmailProcessor.php b/CRM/Utils/Mail/EmailProcessor.php
-index 9d68310b9d..2e5beb5bd0 100644
+index 5170346e4c60..0af01aadeee9 100644
 --- a/CRM/Utils/Mail/EmailProcessor.php
 +++ b/CRM/Utils/Mail/EmailProcessor.php
-@@ -250,6 +250,9 @@ class CRM_Utils_Mail_EmailProcessor {
-           else {
+@@ -211,7 +211,7 @@ private static function _process($civiMail, $dao, $is_create_activities) {
+ 
+             $result = civicrm_api3('Activity', 'create', $activityParams);
              $matches = TRUE;
-             CRM_Utils_Hook::emailProcessor('activity', $params, $mail, $result);
-+            if (class_exists('CRM_Mailutils_Hook')) {
-+              CRM_Mailutils_Hook::greenpeaceEmailProcessor('activity', $params, $mail, $result, $dao);
-+            }
+-            CRM_Utils_Hook::emailProcessor('activity', $activityParams, $mail, $result);
++            CRM_Utils_Hook::emailProcessor('activity', $activityParams, $mail, $result, NULL, $dao->id);
              echo "Processed as Activity: {$mail->subject}\n";
+           }
+           catch (Exception $e) {
+@@ -337,7 +337,7 @@ private static function _process($civiMail, $dao, $is_create_activities) {
+             echo "Failed Processing: {$mail->subject}, Action: $action, Job ID: $job, Queue ID: $queue, Hash: $hash. Reason: {$result['error_message']}\n";
+           }
+           else {
+-            CRM_Utils_Hook::emailProcessor('mailing', $activityParams, $mail, $result, $action);
++            CRM_Utils_Hook::emailProcessor('mailing', $activityParams, $mail, $result, $action, $dao->id);
            }
          }

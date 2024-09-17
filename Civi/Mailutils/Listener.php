@@ -56,7 +56,7 @@ class Listener {
         Civi::log()->warning('Skipping inbound email without activity');
         return;
       }
-      $processor = new Processor($event->mail, $event->result['id'], $event->mailSettings->id);
+      $processor = new Processor($event->mail, $event->result['id'], $event->mailSettingId);
       $processor->process();
     }
   }

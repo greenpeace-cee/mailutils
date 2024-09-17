@@ -23,7 +23,7 @@ function mailutils_civicrm_config(&$config) {
     PHP_INT_MAX - 1
   );
   Civi::dispatcher()->addListener(
-    'hook_civicrm_greenpeaceEmailProcessor',
+    'hook_civicrm_emailProcessor',
     'Civi\Mailutils\Listener::emailProcessor',
     PHP_INT_MAX - 1
   );

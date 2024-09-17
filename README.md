@@ -37,7 +37,7 @@ cv en mailutils
 
 ## Core Patch
 
-This extension currently requires the core patch located in `GP-9999.patch`
+CiviCRM versions before 5.76 require the core patch located in `GP-9999.patch`
 to be applied. Depending on your CMS and path layout, some variation of this
 should work:
 

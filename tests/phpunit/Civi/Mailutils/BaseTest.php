@@ -42,6 +42,12 @@ abstract class BaseTest extends TestCase implements HeadlessInterface, HookInter
       'source' => self::FIXTURE_PATH . '/maildir',
       'domain_id' => $domain,
       'activity_status' => 'Completed',
+      'activity_source' => 'from',
+      'activity_targets' => 'to,cc,bcc',
+      'activity_type_id' => \CRM_Core_PseudoConstant::getKey('CRM_Activity_BAO_Activity', 'activity_type_id', 'Inbound Email'),
+      'activity_assignees' => 'from',
+      'is_non_case_email_skipped' => 0,
+      'is_contact_creation_disabled_if_no_match' => 0,
     ]);
   }
 
