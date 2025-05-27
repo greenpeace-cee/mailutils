@@ -59,15 +59,30 @@ class MailutilsEmailActivity extends Generic\AbstractEntity {
 
   public static function get($check_permissions = TRUE) {
     return (new Generic\BasicGetAction(__CLASS__, __FUNCTION__, function($action) use ($check_permissions) {
-      $activities = (array) Activity::get($check_permissions)
+      $query = Activity::get($check_permissions)
         ->addSelect('id', 'mailutils_message.headers', 'mailutils_message.body')
         ->addJoin(
           'MailutilsMessage AS mailutils_message',
-          'LEFT',
+          'INNER',
           ['mailutils_message.activity_id', '=', 'id']
-        )
-        ->addWhere('activity_type_id:name', '=', 'Inbound Email')
-        ->execute();
+        );
+
+      $action_params = $action->getParams();
+
+      if (isset($action_params['where'])) {
+        foreach ($action_params['where'] as $filter) {
+          if ($filter[0] === 'id') {
+            $query->addWhere('id', $filter[1], $filter[2]);
+            break;
+          }
+        }
+      }
+
+      if (isset($action_params['limit'])) {
+        $query->setLimit($action_params['limit']);
+      }
+
+      $activities = (array) $query->execute();
 
       foreach ($activities as &$activity) {
         $email_headers = json_decode($activity['mailutils_message.headers'], TRUE);
