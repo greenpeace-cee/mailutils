@@ -18,8 +18,8 @@ class CRM_Mailutils_Utils_MessageRenderer {
     $renderedMessage = $smarty->fetchWith('CRM/Mailutils/EmailActivityDetails.tpl', [
       'from'    => htmlentities($email['from']),
       'to'      => htmlentities($email['to']),
-      'cc'      => htmlentities($email['cc']),
-      'bcc'     => htmlentities($email['bcc']),
+      'cc'      => htmlentities(implode(', ', $email['cc'])),
+      'bcc'     => htmlentities(implode(', ', $email['bcc'])),
       'subject' => htmlentities($email['subject']),
       'date'    => htmlentities($email['date']),
       'body'    => nl2br(trim($email['body'])),
