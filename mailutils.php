@@ -101,7 +101,7 @@ function mailutils_civicrm_coreResourceList(&$list, $region) {
 function mailutils_civicrm_buildForm($form_name, &$form) {
   switch ($form_name) {
     case 'CRM_Activity_Form_ActivityView': {
-      $activity_template_data = $form->getTemplateVars('values');
+      $activity_template_data = _mailutils_get_template_vars($form, 'values');
       $activity_id = $activity_template_data['id'];
       $email_display = CRM_Mailutils_Utils_MessageRenderer::render($activity_id);
 
@@ -114,16 +114,18 @@ function mailutils_civicrm_buildForm($form_name, &$form) {
     }
 
     case 'CRM_Case_Form_ActivityView': {
-      $activity_template_data = $form->getTemplateVars('report');
-      $activity_id = $form->getTemplateVars('activityID');
+      $activity_template_data = _mailutils_get_template_vars($form, 'report');
+      $activity_id = _mailutils_get_template_vars($form, 'activityID');
       $email_display = CRM_Mailutils_Utils_MessageRenderer::render($activity_id);
 
       if (is_null($email_display)) return;
 
-      $field_index = array_find_key(
-        $activity_template_data['fields'],
-        fn ($field) => $field['name'] === 'Details'
-      );
+      foreach ($activity_template_data['fields'] as $index => $field) {
+        if ($field['name'] === 'Details') {
+          $field_index = $index;
+          break;
+        }
+      }
 
       $activity_template_data['fields'][$field_index]['value'] = $email_display;
       $form->assign('report', $activity_template_data);
@@ -132,7 +134,7 @@ function mailutils_civicrm_buildForm($form_name, &$form) {
     }
 
     case 'CRM_Fastactivity_Form_View': {
-      $activity_template_data = $form->getTemplateVars('activity');
+      $activity_template_data = _mailutils_get_template_vars($form, 'activity');
       $activity_id = $activity_template_data['activityId'];
       $email_display = CRM_Mailutils_Utils_MessageRenderer::render($activity_id);
 
@@ -144,4 +146,11 @@ function mailutils_civicrm_buildForm($form_name, &$form) {
       break;
     }
   }
+}
+
+function _mailutils_get_template_vars(CRM_Core_Form $form, $name) {
+  if (method_exists($form, 'getTemplateVars')) {
+    return $form->getTemplateVars($name);
+  }
+  return $form->get_template_vars($name);
 }
