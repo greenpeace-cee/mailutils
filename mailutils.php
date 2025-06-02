@@ -100,6 +100,18 @@ function mailutils_civicrm_coreResourceList(&$list, $region) {
  */
 function mailutils_civicrm_buildForm($form_name, &$form) {
   switch ($form_name) {
+    case 'CRM_Activity_Form_Activity': {
+      $form_values = $form->get('values');
+      $activity_id = $form_values['activity_id'];
+      $email_display = CRM_Mailutils_Utils_MessageRenderer::render($activity_id);
+
+      if (is_null($email_display)) return;
+
+      $form->getElement('details')->setValue($email_display);
+
+      break;
+    }
+
     case 'CRM_Activity_Form_ActivityView': {
       $activity_template_data = _mailutils_get_template_vars($form, 'values');
       $activity_id = $activity_template_data['id'];
@@ -109,6 +121,18 @@ function mailutils_civicrm_buildForm($form_name, &$form) {
 
       $activity_template_data['details'] = $email_display;
       $form->assign('values', $activity_template_data);
+
+      break;
+    }
+
+    case 'CRM_Case_Form_Activity': {
+      $form_values = $form->get('values');
+      $activity_id = $form_values['activity_id'];
+      $email_display = CRM_Mailutils_Utils_MessageRenderer::render($activity_id);
+
+      if (is_null($email_display)) return;
+
+      $form->getElement('details')->setValue($email_display);
 
       break;
     }
