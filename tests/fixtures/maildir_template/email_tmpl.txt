@@ -1,0 +1,16 @@
+Delivered-To: my@example.com
+Received: by 10.2.13.84 with SMTP id 1234567890;
+        <date>
+Return-Path: <>
+From: my@example.com
+To: <recipient>
+CC: <cc>
+Subject: <subject>
+Message-ID: <message_id>
+Date: <date>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+
+Message body

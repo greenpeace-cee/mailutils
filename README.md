@@ -1,5 +1,7 @@
 # mailutils
 
+[![Run unit tests](https://github.com/greenpeace-cee/mailutils/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/greenpeace-cee/mailutils/actions/workflows/unit-tests.yml)
+
 mailutils provides a framework for email clients in CiviCRM. It is typically
 used in combination with other extensions like [supportcase](https://github.com/greenpeace-cee/supportcase).
 
