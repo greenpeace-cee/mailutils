@@ -61,16 +61,17 @@ class Message {
       }
     }
 
+    $activity_update = Activity::update(FALSE)
+      ->addWhere('id', '=', $this->activityId)
+      ->addValue('medium_id:name', 'email');
+
     // adjust activity date to include seconds
     if (!empty($this->mail->getHeader('Date'))) {
-      Activity::update(FALSE)
-        ->addWhere('id', '=', $this->activityId)
-        ->addValue(
-          'activity_date_time',
-          date('YmdHis', strtotime($this->mail->getHeader('Date')))
-        )
-        ->execute();
+        $activity_date_time = date('YmdHis', strtotime($this->mail->getHeader('Date')));
+        $activity_update->addValue('activity_date_time', $activity_date_time);
     }
+
+    $activity_update->execute();
   }
 
   /**

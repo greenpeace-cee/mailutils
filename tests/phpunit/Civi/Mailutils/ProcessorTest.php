@@ -2,6 +2,7 @@
 
 namespace Civi\Mailutils;
 
+use Civi\Api4\Activity;
 use Civi\Api4\MailutilsMessage;
 
 /**
@@ -15,33 +16,50 @@ class ProcessorTest extends BaseTest {
    * Test that inbound messages are processed and stored
    */
   public function testInboundMessage() {
-    copy(self::FIXTURE_PATH . '/maildir_template/sample.txt', self::FIXTURE_PATH . '/maildir/sample.txt');
-    $this->callAPISuccess('job', 'fetch_activities');
-    $activity = $this->callAPISuccess('Activity', 'get', [
-      'subject' => self::FIXTURE_SUBJECT,
-    ]);
-    $this->assertEquals(
-      1,
-      $activity['count'],
-      'Should create activity for inbound email'
+    copy(
+      self::FIXTURE_PATH . '/maildir_template/sample.txt',
+      self::FIXTURE_PATH . '/maildir/sample.txt'
     );
-    $activity = reset($activity['values']);
+
+    $this->callAPISuccess('job', 'fetch_activities');
+
+    $activity = Activity::get(FALSE)
+      ->addSelect('id', 'details', 'medium_id:name')
+      ->addWhere('subject', '=', self::FIXTURE_SUBJECT)
+      ->execute()
+      ->first();
+
+    $this->assertNotNull($activity, 'Should create activity for inbound email');
+    $this->assertEquals('email', $activity['medium_id:name']);
+
     $this->assertStringContainsString(
       'Message body',
       $activity['details'],
       'Activity should have details with message body'
     );
+
     $mailutilsMessages = MailutilsMessage::get()
       ->addWhere('activity_id', '=', $activity['id'])
       ->execute();
+
     $this->assertEquals(1, $mailutilsMessages->count());
+
     $message = $mailutilsMessages->first();
+
     // TODO: in_reply_to
     $this->assertEquals(self::FIXTURE_SUBJECT, $message['subject']);
     $this->assertEquals('Sample message', $message['subject_normalized']);
     $this->assertEquals('abc.def.fhi@example.com', $message['message_id']);
-    $this->assertEquals('{"Delivered-To":["my@example.com"],"Received":["by 10.2.13.84 with SMTP id 1234567890;        Wed, 19 Dec 2018 10:01:11 +0100 (CET)"],"Return-Path":"<>","From":"my@example.com","To":"b.2.1.aaaaaaaaaaaaaaaa@example.com","Subject":"=?UTF-8?Q?Re:_Sample_message?=","Message-ID":"<abc.def.fhi@example.com>","Date":"Wed, 19 Dec 2018 10:01:07 +0100","MIME-Version":["1.0"],"Content-Type":"text\/plain; charset=utf-8; format=flowed","Content-Language":["en-US"],"Content-Transfer-Encoding":"8bit"}', $message['headers']);
-    $this->assertEquals('[{"headers":{"Content-Type":"text\/plain; charset=utf-8; format=flowed","Content-Transfer-Encoding":"8bit"},"text":"Message body"}]', $message['body']);
+
+    $this->assertEquals(
+      '{"Delivered-To":["my@example.com"],"Received":["by 10.2.13.84 with SMTP id 1234567890;        Wed, 19 Dec 2018 10:01:11 +0100 (CET)"],"Return-Path":"<>","From":"my@example.com","To":"b.2.1.aaaaaaaaaaaaaaaa@example.com","Subject":"=?UTF-8?Q?Re:_Sample_message?=","Message-ID":"<abc.def.fhi@example.com>","Date":"Wed, 19 Dec 2018 10:01:07 +0100","MIME-Version":["1.0"],"Content-Type":"text\/plain; charset=utf-8; format=flowed","Content-Language":["en-US"],"Content-Transfer-Encoding":"8bit"}',
+      $message['headers']
+    );
+
+    $this->assertEquals(
+      '[{"headers":{"Content-Type":"text\/plain; charset=utf-8; format=flowed","Content-Transfer-Encoding":"8bit"},"text":"Message body"}]',
+      $message['body']
+    );
   }
 
   /**
