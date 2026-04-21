@@ -53,7 +53,7 @@ class Listener {
   public static function emailProcessor(GenericHookEvent $event) {
     if ($event->type == 'activity') {
       if (!is_array($event->result) || empty($event->result['id'])) {
-        Civi::log()->warning('Skipping inbound email without activity');
+        \Civi::log()->warning('Skipping inbound email without activity');
         return;
       }
       $processor = new Processor($event->mail, $event->result['id'], $event->mailSettingId);

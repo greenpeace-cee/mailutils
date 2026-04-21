@@ -111,7 +111,7 @@ class Send extends \Civi\Api4\Generic\AbstractAction {
     if (defined('CIVICRM_MAIL_LOG') && !defined('CIVICRM_MAIL_LOG_AND_SEND')) {
       $send = FALSE;
 
-      \Civi::log('mailutils')->debug(
+      \Civi::log()->debug(
         'Simulating sending of MailutilsMessage ID=' . $message['id'],
         ['headers' => $headers, 'body' => $body]
       );

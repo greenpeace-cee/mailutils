@@ -30,6 +30,7 @@ class Processor {
   }
 
   public function process() {
+    \Civi::log()->debug("Processing mailutils activity $this->activityId");
     $meta = new Message($this->mail, $this->activityId, $this->mailSettings);
     $meta->process();
     $caseId = NULL;
@@ -91,15 +92,17 @@ class Processor {
 
   private static function callSQLTask($taskId, $taskInputParams = []) {
     try {
-      civicrm_api3('Sqltask', 'execute', [
+      $result = civicrm_api3('Sqltask', 'execute', [
         'id'          => $taskId,
         'input_val'   => json_encode($taskInputParams),
         'log_to_file' => 1,
         'check_permissions' => FALSE,
+        'async' => TRUE,
       ]);
+      \Civi::log()->debug("Executed mailutils post-processor SQL Task $taskId: " . json_encode($result));
     } catch (\CiviCRM_API3_Exception $ex) {
       $errMsg = $ex->getMessage();
-      Civi::log('mailutils')->error("Error executing post-processor SQL Task $taskId: $errMsg");
+      \Civi::log()->error("Error executing post-processor SQL Task $taskId: $errMsg");
     }
   }
 
