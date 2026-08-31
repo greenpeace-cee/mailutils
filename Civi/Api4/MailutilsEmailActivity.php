@@ -98,7 +98,13 @@ class MailutilsEmailActivity extends Generic\AbstractEntity {
           ['bcc.mailutils_message_id', '=', 'message.id'],
           ['bcc.party_type_id:name', '=', "'bcc'"]
         )
-        ->addGroupBy('id');
+        ->addGroupBy('id')
+        ->addGroupBy('message.subject')
+        ->addGroupBy('message.body')
+        ->addGroupBy('from.name')
+        ->addGroupBy('from.email')
+        ->addGroupBy('to.name')
+        ->addGroupBy('to.email');
 
       $action_params = $action->getParams();
 
